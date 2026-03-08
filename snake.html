@@ -193,6 +193,95 @@
         .info-panel .record-display {
             white-space: nowrap;
         }
+
+        .speed-display {
+            color: #9bbc0f;
+            font-size: 0.5rem;
+        }
+
+        .speed-display span {
+            color: #9bbc0f;
+        }
+
+        .time-display {
+            color: #9bbc0f;
+            font-size: 0.5rem;
+        }
+
+        .time-display span {
+            color: #9bbc0f;
+        }
+
+        .buffs-display {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.4rem;
+            color: #9bbc0f;
+        }
+
+        .buff-timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .buff-timer-icon {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend {
+            margin-top: 8px;
+            padding: 8px;
+            border: 1px solid #306230;
+            border-radius: 4px;
+            font-size: 0.4rem;
+            color: #9bbc0f;
+        }
+
+        .legend-title {
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        .legend-food {
+            background: #0f380f;
+            border-radius: 2px;
+        }
+
+        .legend-obstacle {
+            background: #5c4033;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .legend-dangerous {
+            background: #8b0000;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+
+        .legend-buff-sm { background: #6a0dad; border-radius: 2px; }
+        .legend-buff-dp { background: #ffd700; border-radius: 2px; }
+        .legend-buff-prot { background: #1e90ff; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -211,13 +300,44 @@
                     <h2>Game Over!</h2>
                     <p>Pontuação final: <span id="finalScore">0</span></p>
                     <p>Nível alcançado: <span id="finalLevel">1</span></p>
+                    <p>Tempo: <span id="finalTime">0:00</span></p>
                     <button id="restartBtnOverlay">Reiniciar</button>
                 </div>
             </div>
             <div class="info-panel">
                 <div class="score-display">Placar: <span id="score">0</span></div>
                 <div class="level-display">Nível: <span id="level">1</span></div>
+                <div class="time-display">Tempo: <span id="gameTime">0:00</span></div>
                 <div class="record-display">Recorde: <span id="recordScore">--</span> <span id="recordName"></span></div>
+                <div class="speed-display">Velocidade: <span id="speed">1.0</span>x</div>
+                <div id="buffsDisplay" class="buffs-display"></div>
+                <div class="legend">
+                    <div class="legend-title">Legenda</div>
+                    <div class="legend-item">
+                        <span class="legend-icon legend-food"></span>
+                        <span>Comida</span>
+                    </div>
+                    <div class="legend-item" id="legendObstacle" style="display:none">
+                        <span class="legend-icon legend-obstacle"></span>
+                        <span>Obstáculo</span>
+                    </div>
+                    <div class="legend-item" id="legendDangerous" style="display:none">
+                        <span class="legend-icon legend-dangerous"></span>
+                        <span>Obstáculo perigoso</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon legend-buff-sm"></span>
+                        <span>Slow Motion</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon legend-buff-dp"></span>
+                        <span>Double Points</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-icon legend-buff-prot"></span>
+                        <span>Protection</span>
+                    </div>
+                </div>
                 <button id="restartBtn" style="display: none;">Reiniciar</button>
             </div>
         </div>
@@ -234,35 +354,48 @@
                     return audioCtx;
                 }
 
-                function playTone(freq, duration, type) {
-                    const ctx = getContext();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.frequency.value = freq;
-                    osc.type = type || 'square';
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + duration);
+                function ensureRunning() {
+                    try {
+                        const ctx = getContext();
+                        if (ctx.state === 'suspended') ctx.resume();
+                    } catch (e) {}
                 }
 
-                return {
-                    eat: function() { playTone(800, 0.08, 'square'); },
-                    gameOver: function() {
+                function playTone(freq, duration, type) {
+                    try {
+                        ensureRunning();
                         const ctx = getContext();
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.type = 'sawtooth';
-                        gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                        osc.frequency.setValueAtTime(400, ctx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+                        osc.frequency.value = freq;
+                        osc.type = type || 'square';
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
                         osc.start(ctx.currentTime);
-                        osc.stop(ctx.currentTime + 0.3);
+                        osc.stop(ctx.currentTime + duration);
+                    } catch (e) {}
+                }
+
+                return {
+                    eat: function() { playTone(800, 0.08, 'square'); },
+                    gameOver: function() {
+                        try {
+                            ensureRunning();
+                            const ctx = getContext();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.type = 'sawtooth';
+                            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                            osc.frequency.setValueAtTime(400, ctx.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+                            osc.start(ctx.currentTime);
+                            osc.stop(ctx.currentTime + 0.3);
+                        } catch (e) {}
                     },
                     start: function() { playTone(440, 0.05, 'sine'); },
                     unlock: function() {
@@ -274,10 +407,10 @@
 
             document.addEventListener('keydown', function unlockKey() {
                 AudioSystem.unlock();
-            }, { once: true });
+            });
             document.addEventListener('click', function unlockClick() {
                 AudioSystem.unlock();
-            }, { once: true });
+            });
 
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
@@ -285,18 +418,28 @@
             const levelEl = document.getElementById('level');
             const finalScoreEl = document.getElementById('finalScore');
             const finalLevelEl = document.getElementById('finalLevel');
+            const finalTimeEl = document.getElementById('finalTime');
+            const gameTimeEl = document.getElementById('gameTime');
+            const buffsDisplayEl = document.getElementById('buffsDisplay');
             const restartBtn = document.getElementById('restartBtn');
             const restartBtnOverlay = document.getElementById('restartBtnOverlay');
             const gameOverOverlay = document.getElementById('gameOverOverlay');
 
-            const gridSize = 20;
-            const cellSize = canvas.width / gridSize;
+            const baseGridSize = 20;
+            let cellPx = 20;
+            let currentGridSize = 20;
 
             const INITIAL_SPEED = 150;
             const MIN_SPEED = 50;
             const POINTS_PER_FOOD = 10;
             const POINTS_PER_LEVEL = 50;
-            const SPEED_INCREASE_PER_LEVEL = 0.25;
+            const SPEED_INCREASE_PER_LEVEL = 0.1;
+
+            const BUFF_TYPES = ['slowMotion', 'doublePoints', 'protection'];
+            const BUFF_DURATIONS = { slowMotion: 20, doublePoints: 10, protection: 20 };
+            const BUFF_COLORS = { slowMotion: '#6a0dad', doublePoints: '#ffd700', protection: '#1e90ff' };
+            const BUFF_NAMES = { slowMotion: 'Slow', doublePoints: '2x', protection: 'Prot' };
+            const BUFF_SPAWN_CHANCE = 0.6;
 
             const RecordeSystem = (function() {
                 const KEY = 'snakeRecorde';
@@ -330,6 +473,12 @@
             let gameOver = false;
             let levelUpPaused = false;
             let gameLoopId = null;
+            let obstacles = [];
+            let dangerousObstacles = [];
+            let buffItem = null;
+            let activeBuffs = {};
+            let protectionGraceTick = false;
+            let gameStartTime = 0;
 
             const directions = {
                 up: { x: 0, y: -1 },
@@ -344,6 +493,18 @@
                 left: 'right',
                 right: 'left'
             };
+
+            function resizeCanvas() {
+                const docSize = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+                cellPx = Math.max(10, Math.floor(docSize / currentGridSize));
+                const size = currentGridSize * cellPx;
+                canvas.width = size;
+                canvas.height = size;
+            }
+
+            function getCellSize() {
+                return cellPx;
+            }
 
             function getSpeedForLevel(lvl) {
                 const multiplier = 1 + (lvl - 1) * SPEED_INCREASE_PER_LEVEL;
@@ -365,13 +526,21 @@
                     levelUpPaused = false;
                     levelEl.textContent = level;
                     gameSpeed = getSpeedForLevel(level);
+                    updateSpeedDisplay();
+                    updateLegendDisplay();
                     gameLoopId = setInterval(tick, gameSpeed);
                 }, 1500);
             }
 
             function initGame() {
-                const centerX = Math.floor(gridSize / 2);
-                const centerY = Math.floor(gridSize / 2);
+                currentGridSize = baseGridSize;
+                resizeCanvas();
+                buffItem = null;
+                activeBuffs = {};
+                protectionGraceTick = false;
+                gameStartTime = Date.now();
+                const centerX = Math.floor(currentGridSize / 2);
+                const centerY = Math.floor(currentGridSize / 2);
                 snake = [
                     { x: centerX, y: centerY },
                     { x: centerX - 1, y: centerY },
@@ -384,13 +553,81 @@
                 gameSpeed = getSpeedForLevel(1);
                 gameOver = false;
                 levelUpPaused = false;
+                obstacles = [];
+                dangerousObstacles = [];
                 spawnFood();
+                spawnObstacles();
                 scoreEl.textContent = score;
                 levelEl.textContent = level;
                 gameOverOverlay.style.display = 'none';
                 document.getElementById('levelUpOverlay').style.display = 'none';
                 restartBtn.style.display = 'none';
                 updateRecordeDisplay();
+                updateSpeedDisplay();
+                updateLegendDisplay();
+                updateTimeDisplay();
+                updateBuffDisplay();
+                spawnBuff();
+            }
+
+            function isBuffPosition(x, y) {
+                return buffItem && buffItem.x === x && buffItem.y === y;
+            }
+
+            function spawnBuff() {
+                if (buffItem !== null || Math.random() >= BUFF_SPAWN_CHANCE) return;
+                const blocked = new Set();
+                snake.forEach(seg => blocked.add(seg.x + ',' + seg.y));
+                blocked.add(food.x + ',' + food.y);
+                obstacles.forEach(obs => blocked.add(obs.x + ',' + obs.y));
+                dangerousObstacles.forEach(obs => blocked.add(obs.x + ',' + obs.y));
+                let attempts = 0;
+                while (attempts < 100) {
+                    const x = Math.floor(Math.random() * currentGridSize);
+                    const y = Math.floor(Math.random() * currentGridSize);
+                    if (!blocked.has(x + ',' + y)) {
+                        const availableTypes = level >= 1 ? BUFF_TYPES : BUFF_TYPES.filter(t => t !== 'protection');
+                        buffItem = { x, y, type: availableTypes[Math.floor(Math.random() * availableTypes.length)] };
+                        return;
+                    }
+                    attempts++;
+                }
+            }
+
+            function applyBuff(type) {
+                const duration = BUFF_DURATIONS[type] || 20;
+                activeBuffs[type] = Date.now() + duration * 1000;
+                buffItem = null;
+                if (type === 'slowMotion') {
+                    const newSpeed = Math.min(300, Math.floor(gameSpeed * 1.5));
+                    gameSpeed = newSpeed;
+                    if (gameLoopId) {
+                        clearInterval(gameLoopId);
+                        gameLoopId = setInterval(tick, gameSpeed);
+                    }
+                    updateSpeedDisplay();
+                }
+                spawnBuff();
+            }
+
+            function updateBuffs() {
+                protectionGraceTick = false;
+                const now = Date.now();
+                for (const type in activeBuffs) {
+                    if (now >= activeBuffs[type]) {
+                        delete activeBuffs[type];
+                        if (type === 'protection') {
+                            protectionGraceTick = true;
+                        } else if (type === 'slowMotion') {
+                            gameSpeed = getSpeedForLevel(level);
+                            if (gameLoopId) {
+                                clearInterval(gameLoopId);
+                                gameLoopId = setInterval(tick, gameSpeed);
+                            }
+                            updateSpeedDisplay();
+                        }
+                    }
+                }
             }
 
             function updateRecordeDisplay() {
@@ -399,43 +636,198 @@
                 document.getElementById('recordName').textContent = r ? `(${r.name})` : '';
             }
 
+            function updateSpeedDisplay() {
+                document.getElementById('speed').textContent = (INITIAL_SPEED / gameSpeed).toFixed(1);
+            }
+
+            function formatTime(ms) {
+                const sec = Math.floor(ms / 1000);
+                const m = Math.floor(sec / 60);
+                const s = sec % 60;
+                return m + ':' + (s < 10 ? '0' : '') + s;
+            }
+
+            function updateTimeDisplay() {
+                if (gameOver) return;
+                gameTimeEl.textContent = formatTime(Date.now() - gameStartTime);
+            }
+
+            function updateBuffDisplay() {
+                const now = Date.now();
+                let html = '';
+                for (const type in activeBuffs) {
+                    const remaining = Math.ceil((activeBuffs[type] - now) / 1000);
+                    if (remaining > 0) {
+                        const name = BUFF_NAMES[type] || type;
+                        const color = BUFF_COLORS[type] || '#9bbc0f';
+                        html += '<div class="buff-timer"><span class="buff-timer-icon" style="background:' + color + '"></span><span>' + name + ': ' + remaining + 's</span></div>';
+                    }
+                }
+                buffsDisplayEl.innerHTML = html;
+            }
+
+            function updateLegendDisplay() {
+                document.getElementById('legendObstacle').style.display = level >= 3 ? 'flex' : 'none';
+                document.getElementById('legendDangerous').style.display = level >= 1 ? 'flex' : 'none';
+            }
+
+            function isBlocked(x, y) {
+                return obstacles.some(obs => obs.x === x && obs.y === y);
+            }
+
+            function isOnDangerousObstacle(x, y) {
+                return dangerousObstacles.some(obs => obs.x === x && obs.y === y);
+            }
+
+            function spawnObstacles() {
+                obstacles = [];
+                dangerousObstacles = [];
+                const blocked = new Set();
+                snake.forEach(seg => blocked.add(seg.x + ',' + seg.y));
+                blocked.add(food.x + ',' + food.y);
+                if (buffItem) blocked.add(buffItem.x + ',' + buffItem.y);
+                if (level >= 3) {
+                    const count = level - 2;
+                    for (let i = 0; i < count; i++) {
+                        let pos = null;
+                        let attempts = 0;
+                        while (attempts < 100) {
+                            const x = Math.floor(Math.random() * currentGridSize);
+                            const y = Math.floor(Math.random() * currentGridSize);
+                            const key = x + ',' + y;
+                            if (!blocked.has(key)) {
+                                pos = { x, y };
+                                blocked.add(key);
+                                break;
+                            }
+                            attempts++;
+                        }
+                        if (pos) obstacles.push(pos);
+                    }
+                }
+                if (level >= 1) {
+                    const dangerousCount = Math.max(1, level - 4);
+                    for (let i = 0; i < dangerousCount; i++) {
+                        let pos = null;
+                        let attempts = 0;
+                        while (attempts < 100) {
+                            const x = Math.floor(Math.random() * currentGridSize);
+                            const y = Math.floor(Math.random() * currentGridSize);
+                            const key = x + ',' + y;
+                            if (!blocked.has(key)) {
+                                pos = { x, y };
+                                blocked.add(key);
+                                break;
+                            }
+                            attempts++;
+                        }
+                        if (pos) dangerousObstacles.push(pos);
+                    }
+                }
+            }
+
             function spawnFood() {
                 let validPosition = false;
                 let newFood = { x: 0, y: 0 };
 
                 while (!validPosition) {
-                    newFood.x = Math.floor(Math.random() * gridSize);
-                    newFood.y = Math.floor(Math.random() * gridSize);
-                    validPosition = !snake.some(seg => seg.x === newFood.x && seg.y === newFood.y);
+                    newFood.x = Math.floor(Math.random() * currentGridSize);
+                    newFood.y = Math.floor(Math.random() * currentGridSize);
+                    validPosition = !snake.some(seg => seg.x === newFood.x && seg.y === newFood.y) && !isBlocked(newFood.x, newFood.y) && !isOnDangerousObstacle(newFood.x, newFood.y) && !isBuffPosition(newFood.x, newFood.y);
                 }
 
                 food = newFood;
             }
 
             function drawSnake() {
+                const cs = getCellSize();
                 snake.forEach((seg, i) => {
                     ctx.fillStyle = i === 0 ? '#0f380f' : '#306230';
                     ctx.strokeStyle = '#0f380f';
                     ctx.lineWidth = 1;
-                    ctx.fillRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
-                    ctx.strokeRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
+                    ctx.fillRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
+                    ctx.strokeRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
+                });
+            }
+
+            function drawObstacles() {
+                const cs = getCellSize();
+                obstacles.forEach(obs => {
+                    const cx = obs.x * cs + cs / 2;
+                    const cy = obs.y * cs + cs / 2;
+                    const s = cs / 2 - 2;
+                    ctx.fillStyle = '#5c4033';
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy - s);
+                    ctx.lineTo(cx + s, cy);
+                    ctx.lineTo(cx, cy + s);
+                    ctx.lineTo(cx - s, cy);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = '#3d2e22';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                });
+            }
+
+            function drawDangerousObstacles() {
+                const cs = getCellSize();
+                dangerousObstacles.forEach(obs => {
+                    const cx = obs.x * cs + cs / 2;
+                    const cy = obs.y * cs + cs / 2;
+                    const s = cs / 2 - 2;
+                    ctx.fillStyle = '#8b0000';
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy - s);
+                    ctx.lineTo(cx + s, cy);
+                    ctx.lineTo(cx, cy + s);
+                    ctx.lineTo(cx - s, cy);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = '#5c0000';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
                 });
             }
 
             function drawFood() {
+                const cs = getCellSize();
                 ctx.fillStyle = '#0f380f';
                 ctx.strokeStyle = '#0f380f';
                 ctx.lineWidth = 1;
                 const padding = 4;
-                ctx.fillRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
-                ctx.strokeRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
+                ctx.fillRect(food.x * cs + padding, food.y * cs + padding, cs - padding * 2, cs - padding * 2);
+                ctx.strokeRect(food.x * cs + padding, food.y * cs + padding, cs - padding * 2, cs - padding * 2);
+            }
+
+            function drawBuff() {
+                if (!buffItem) return;
+                const cs = getCellSize();
+                const cx = buffItem.x * cs + cs / 2;
+                const cy = buffItem.y * cs + cs / 2;
+                const s = cs / 2 - 2;
+                const color = BUFF_COLORS[buffItem.type] || '#888';
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - s);
+                ctx.lineTo(cx + s, cy);
+                ctx.lineTo(cx, cy + s);
+                ctx.lineTo(cx - s, cy);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
             }
 
             function draw() {
                 ctx.fillStyle = '#9bbc0f';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+                drawObstacles();
+                drawDangerousObstacles();
                 drawFood();
+                drawBuff();
                 drawSnake();
             }
 
@@ -443,24 +835,43 @@
                 direction = nextDirection;
                 const head = snake[0];
                 const delta = directions[direction];
-                const newHead = {
+                let newHead = {
                     x: head.x + delta.x,
                     y: head.y + delta.y
                 };
+                const hasProtection = activeBuffs.protection || protectionGraceTick;
+                if (hasProtection && (newHead.x < 0 || newHead.x >= currentGridSize || newHead.y < 0 || newHead.y >= currentGridSize)) {
+                    newHead.x = ((newHead.x % currentGridSize) + currentGridSize) % currentGridSize;
+                    newHead.y = ((newHead.y % currentGridSize) + currentGridSize) % currentGridSize;
+                }
 
                 if (newHead.x === food.x && newHead.y === food.y) {
                     snake.unshift(newHead);
-                    score += POINTS_PER_FOOD;
+                    const points = activeBuffs.doublePoints ? POINTS_PER_FOOD * 2 : POINTS_PER_FOOD;
+                    score += points;
                     scoreEl.textContent = score;
                     AudioSystem.eat();
 
                     const newLevel = Math.min(100, Math.floor(score / POINTS_PER_LEVEL) + 1);
                     if (newLevel > level) {
                         level = newLevel;
+                        spawnObstacles();
+                        spawnBuff();
                         showLevelUp();
                     }
 
                     spawnFood();
+                    spawnBuff();
+                } else if (buffItem && newHead.x === buffItem.x && newHead.y === buffItem.y) {
+                    snake.unshift(newHead);
+                    snake.pop();
+                    applyBuff(buffItem.type);
+                } else if (isOnDangerousObstacle(newHead.x, newHead.y) && !hasProtection) {
+                    snake.unshift(newHead);
+                    snake.pop();
+                    endGame();
+                    return;
+                } else if (isBlocked(newHead.x, newHead.y) && !hasProtection) {
                 } else {
                     snake.unshift(newHead);
                     snake.pop();
@@ -469,14 +880,19 @@
 
             function checkCollision() {
                 const head = snake[0];
+                const hasProtection = activeBuffs.protection || protectionGraceTick;
 
-                if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
-                    return true;
-                }
-
-                for (let i = 1; i < snake.length; i++) {
-                    if (head.x === snake[i].x && head.y === snake[i].y) {
+                if (!hasProtection) {
+                    if (head.x < 0 || head.x >= currentGridSize || head.y < 0 || head.y >= currentGridSize) {
                         return true;
+                    }
+                    if (isOnDangerousObstacle(head.x, head.y)) {
+                        return true;
+                    }
+                    for (let i = 1; i < snake.length; i++) {
+                        if (head.x === snake[i].x && head.y === snake[i].y) {
+                            return true;
+                        }
                     }
                 }
 
@@ -484,12 +900,14 @@
             }
 
             function endGame() {
-                AudioSystem.gameOver();
+                if (gameOver) return;
                 gameOver = true;
+                AudioSystem.gameOver();
                 clearInterval(gameLoopId);
                 gameLoopId = null;
                 finalScoreEl.textContent = score;
                 finalLevelEl.textContent = level;
+                finalTimeEl.textContent = formatTime(Date.now() - gameStartTime);
                 if (RecordeSystem.isRecorde(score)) {
                     const name = prompt('Novo recorde! Digite seu nome:', '') || 'Anônimo';
                     RecordeSystem.set(score, name);
@@ -502,6 +920,9 @@
             function tick() {
                 if (gameOver || levelUpPaused) return;
 
+                updateBuffs();
+                if (gameOver) return;
+
                 moveSnake();
 
                 if (checkCollision()) {
@@ -509,6 +930,8 @@
                     return;
                 }
 
+                updateTimeDisplay();
+                updateBuffDisplay();
                 draw();
             }
 
