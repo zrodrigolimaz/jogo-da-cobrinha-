@@ -1719,9 +1719,30 @@
                 drawSprite(key, buffItem.x * cs + padding, buffItem.y * cs + padding, size);
             }
 
+            function drawBackground() {
+                const cs = getCellSize();
+                const w = canvas.width;
+                const h = canvas.height;
+
+                var grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#a0cc10');
+                grad.addColorStop(0.5, '#9bbc0f');
+                grad.addColorStop(1, '#7a9c00');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+
+                var light = '#9bbc0f';
+                var dark = '#8bac0f';
+                for (var i = 0; i < currentGridSize; i++) {
+                    for (var j = 0; j < currentGridSize; j++) {
+                        ctx.fillStyle = (i + j) % 2 === 0 ? light : dark;
+                        ctx.fillRect(i * cs, j * cs, cs, cs);
+                    }
+                }
+            }
+
             function draw() {
-                ctx.fillStyle = '#9bbc0f';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
 
                 drawObstacles();
                 drawDangerousObstacles();
