@@ -1275,7 +1275,8 @@
                     newHead.y = ((newHead.y % currentGridSize) + currentGridSize) % currentGridSize;
                 }
 
-                if (newHead.x === food.x && newHead.y === food.y) {
+                const ateFood = (newHead.x === food.x && newHead.y === food.y) || (head.x === food.x && head.y === food.y);
+                if (ateFood) {
                     const foodType = food.type || 'normal';
                     var points = 0;
                     var atePoison = false;
