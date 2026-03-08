@@ -101,6 +101,7 @@
             left: 0;
             right: 0;
             bottom: 0;
+            z-index: 15;
             background: rgba(15, 56, 15, 0.95);
             display: flex;
             flex-direction: column;
@@ -108,6 +109,7 @@
             align-items: center;
             border-radius: 2px;
             color: #9bbc0f;
+            transition: opacity 0.3s ease;
         }
 
         #levelUpOverlay h2 {
@@ -118,15 +120,6 @@
 
         #levelUpOverlay p {
             font-size: 0.6rem;
-        }
-
-        #levelUpOverlay {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
-
-        #levelUpOverlay.visible {
-            opacity: 1;
         }
 
         #pauseOverlay {
@@ -473,8 +466,8 @@
                 <div class="record-display">Recorde: <span id="recordScore">--</span> <span id="recordName"></span></div>
                 <div class="speed-display">Velocidade: <span id="speed">1.0</span>x</div>
                 <div class="volume-control">
-                    <label for="volumeSlider">Volume: <span id="volumeValue">50</span>%</label>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                    <label for="volumeSlider">Volume: <span id="volumeValue">20</span>%</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="20">
                 </div>
                 <div id="buffsDisplay" class="buffs-display"></div>
                 <div class="legend">
@@ -535,10 +528,14 @@
                 });
             }
 
+            var LEGEND_USE_PNG = { apple: 1, apple_golden: 1, poison: 1, combo: 1 };
+
             function initLegendSprites() {
                 document.querySelectorAll('.legend-sprite[data-sprite]').forEach(function(el) {
                     var key = el.getAttribute('data-sprite');
-                    if (SPRITE_SVG[key]) {
+                    if (LEGEND_USE_PNG[key] && SPRITE_PATHS[key]) {
+                        el.src = SPRITE_PATHS[key];
+                    } else if (SPRITE_SVG[key]) {
                         el.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(SPRITE_SVG[key])));
                     }
                 });
@@ -650,13 +647,13 @@
                             if (bgAudio) {
                                 bgIndex = 0;
                                 bgAudio.src = bgMusicTracks[0];
-                                bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '50', 10) / 100);
+                                bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '20', 10) / 100);
                                 bgAudio.currentTime = 0;
                                 bgAudio.play().catch(function() {});
                                 return;
                             }
                             bgAudio = new Audio(bgMusicTracks[0]);
-                            bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '50', 10) / 100);
+                            bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '20', 10) / 100);
                             bgAudio.loop = false;
                             bgAudio.addEventListener('ended', playNextBgTrack);
                             bgAudio.play().catch(function() {});
@@ -706,7 +703,7 @@
             const volumeSlider = document.getElementById('volumeSlider');
             const volumeValueEl = document.getElementById('volumeValue');
 
-            const savedVolume = parseInt(localStorage.getItem('snakeBgVolume') || '50', 10);
+            const savedVolume = parseInt(localStorage.getItem('snakeBgVolume') || '20', 10);
             if (volumeSlider) {
                 volumeSlider.value = savedVolume;
                 if (volumeValueEl) volumeValueEl.textContent = savedVolume;
@@ -864,14 +861,8 @@
                 const levelUpNumber = document.getElementById('levelUpNumber');
                 levelUpNumber.textContent = level;
                 levelUpOverlay.style.display = 'flex';
-                levelUpOverlay.classList.remove('visible');
-                requestAnimationFrame(function() {
-                    requestAnimationFrame(function() {
-                        levelUpOverlay.classList.add('visible');
-                    });
-                });
+                levelUpOverlay.style.opacity = '1';
                 setTimeout(function() {
-                    levelUpOverlay.classList.remove('visible');
                     levelUpOverlay.style.opacity = '0';
                     setTimeout(function() {
                         levelUpOverlay.style.display = 'none';
