@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Cobrinha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+        }
+
+        .game-container {
+            background: #2a2a2a;
+            padding: 24px;
+            border-radius: 24px;
+            border: 3px solid #1a1a1a;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            color: #9bbc0f;
+            font-size: 0.75rem;
+        }
+
+        .game-layout {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 180px;
+        }
+
+        .score-display {
+            color: #9bbc0f;
+            font-size: 0.6rem;
+        }
+
+        .score-display span {
+            color: #9bbc0f;
+        }
+
+        .record-display {
+            color: #9bbc0f;
+            font-size: 0.5rem;
+        }
+
+        .record-display span {
+            color: #9bbc0f;
+        }
+
+        .level-display {
+            color: #9bbc0f;
+            font-size: 0.5rem;
+        }
+
+        .level-display span {
+            color: #9bbc0f;
+        }
+
+        #levelUpOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 56, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2px;
+            color: #9bbc0f;
+        }
+
+        #levelUpOverlay h2 {
+            color: #9bbc0f;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        #levelUpOverlay p {
+            font-size: 0.6rem;
+        }
+
+        #restartBtn {
+            padding: 8px 16px;
+            font-size: 0.5rem;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #restartBtn:hover {
+            background: #306230;
+        }
+
+        #restartBtn:focus {
+            outline: 2px solid #9bbc0f;
+            outline-offset: 2px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            display: inline-block;
+            background: #0f380f;
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: #9bbc0f;
+            border: 2px solid #0f380f;
+            border-radius: 2px;
+            image-rendering: pixelated;
+        }
+
+        #gameOverOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 56, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2px;
+            color: #9bbc0f;
+        }
+
+        #gameOverOverlay h2 {
+            color: #9bbc0f;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        #gameOverOverlay p {
+            font-size: 0.6rem;
+            margin-bottom: 20px;
+        }
+
+        #gameOverOverlay button {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: 8px 16px;
+            font-size: 0.5rem;
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #gameOverOverlay button:hover {
+            background: #306230;
+        }
+
+        .controls-hint {
+            margin-top: 12px;
+            color: #306230;
+            font-size: 0.4rem;
+        }
+
+        .info-panel .score-display,
+        .info-panel .level-display,
+        .info-panel .record-display {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Jogo da Cobrinha</h1>
+        </div>
+        <div class="game-layout">
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <div id="levelUpOverlay" style="display: none;">
+                    <h2>Level Up!</h2>
+                    <p>Nível <span id="levelUpNumber">2</span></p>
+                </div>
+                <div id="gameOverOverlay" style="display: none;">
+                    <h2>Game Over!</h2>
+                    <p>Pontuação final: <span id="finalScore">0</span></p>
+                    <p>Nível alcançado: <span id="finalLevel">1</span></p>
+                    <button id="restartBtnOverlay">Reiniciar</button>
+                </div>
+            </div>
+            <div class="info-panel">
+                <div class="score-display">Placar: <span id="score">0</span></div>
+                <div class="level-display">Nível: <span id="level">1</span></div>
+                <div class="record-display">Recorde: <span id="recordScore">--</span> <span id="recordName"></span></div>
+                <button id="restartBtn" style="display: none;">Reiniciar</button>
+            </div>
+        </div>
+        <p class="controls-hint">Use W, A, S, D para movimentar</p>
+    </div>
+
+    <script>
+        (function() {
+            const AudioSystem = (function() {
+                let audioCtx = null;
+
+                function getContext() {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    return audioCtx;
+                }
+
+                function playTone(freq, duration, type) {
+                    const ctx = getContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = type || 'square';
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + duration);
+                }
+
+                return {
+                    eat: function() { playTone(800, 0.08, 'square'); },
+                    gameOver: function() {
+                        const ctx = getContext();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sawtooth';
+                        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                        osc.frequency.setValueAtTime(400, ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.3);
+                    },
+                    start: function() { playTone(440, 0.05, 'sine'); },
+                    unlock: function() {
+                        const ctx = getContext();
+                        if (ctx.state === 'suspended') ctx.resume();
+                    }
+                };
+            })();
+
+            document.addEventListener('keydown', function unlockKey() {
+                AudioSystem.unlock();
+            }, { once: true });
+            document.addEventListener('click', function unlockClick() {
+                AudioSystem.unlock();
+            }, { once: true });
+
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const scoreEl = document.getElementById('score');
+            const levelEl = document.getElementById('level');
+            const finalScoreEl = document.getElementById('finalScore');
+            const finalLevelEl = document.getElementById('finalLevel');
+            const restartBtn = document.getElementById('restartBtn');
+            const restartBtnOverlay = document.getElementById('restartBtnOverlay');
+            const gameOverOverlay = document.getElementById('gameOverOverlay');
+
+            const gridSize = 20;
+            const cellSize = canvas.width / gridSize;
+
+            const INITIAL_SPEED = 150;
+            const MIN_SPEED = 50;
+            const POINTS_PER_FOOD = 10;
+            const POINTS_PER_LEVEL = 50;
+            const SPEED_INCREASE_PER_LEVEL = 0.25;
+
+            const RecordeSystem = (function() {
+                const KEY = 'snakeRecorde';
+
+                function get() {
+                    try {
+                        const data = localStorage.getItem(KEY);
+                        return data ? JSON.parse(data) : null;
+                    } catch (e) { return null; }
+                }
+
+                function set(score, name) {
+                    localStorage.setItem(KEY, JSON.stringify({ score, name: name || 'Anônimo' }));
+                }
+
+                function isRecorde(score) {
+                    const r = get();
+                    return !r || score > r.score;
+                }
+
+                return { get, set, isRecorde };
+            })();
+
+            let snake = [];
+            let food = { x: 0, y: 0 };
+            let direction = 'right';
+            let nextDirection = 'right';
+            let score = 0;
+            let level = 1;
+            let gameSpeed = INITIAL_SPEED;
+            let gameOver = false;
+            let levelUpPaused = false;
+            let gameLoopId = null;
+
+            const directions = {
+                up: { x: 0, y: -1 },
+                down: { x: 0, y: 1 },
+                left: { x: -1, y: 0 },
+                right: { x: 1, y: 0 }
+            };
+
+            const opposite = {
+                up: 'down',
+                down: 'up',
+                left: 'right',
+                right: 'left'
+            };
+
+            function getSpeedForLevel(lvl) {
+                const multiplier = 1 + (lvl - 1) * SPEED_INCREASE_PER_LEVEL;
+                return Math.max(MIN_SPEED, Math.floor(INITIAL_SPEED / multiplier));
+            }
+
+            function showLevelUp() {
+                levelUpPaused = true;
+                if (gameLoopId) {
+                    clearInterval(gameLoopId);
+                    gameLoopId = null;
+                }
+                const levelUpOverlay = document.getElementById('levelUpOverlay');
+                const levelUpNumber = document.getElementById('levelUpNumber');
+                levelUpNumber.textContent = level;
+                levelUpOverlay.style.display = 'flex';
+                setTimeout(function() {
+                    levelUpOverlay.style.display = 'none';
+                    levelUpPaused = false;
+                    levelEl.textContent = level;
+                    gameSpeed = getSpeedForLevel(level);
+                    gameLoopId = setInterval(tick, gameSpeed);
+                }, 1500);
+            }
+
+            function initGame() {
+                const centerX = Math.floor(gridSize / 2);
+                const centerY = Math.floor(gridSize / 2);
+                snake = [
+                    { x: centerX, y: centerY },
+                    { x: centerX - 1, y: centerY },
+                    { x: centerX - 2, y: centerY }
+                ];
+                direction = 'right';
+                nextDirection = 'right';
+                score = 0;
+                level = 1;
+                gameSpeed = getSpeedForLevel(1);
+                gameOver = false;
+                levelUpPaused = false;
+                spawnFood();
+                scoreEl.textContent = score;
+                levelEl.textContent = level;
+                gameOverOverlay.style.display = 'none';
+                document.getElementById('levelUpOverlay').style.display = 'none';
+                restartBtn.style.display = 'none';
+                updateRecordeDisplay();
+            }
+
+            function updateRecordeDisplay() {
+                const r = RecordeSystem.get();
+                document.getElementById('recordScore').textContent = r ? r.score : '--';
+                document.getElementById('recordName').textContent = r ? `(${r.name})` : '';
+            }
+
+            function spawnFood() {
+                let validPosition = false;
+                let newFood = { x: 0, y: 0 };
+
+                while (!validPosition) {
+                    newFood.x = Math.floor(Math.random() * gridSize);
+                    newFood.y = Math.floor(Math.random() * gridSize);
+                    validPosition = !snake.some(seg => seg.x === newFood.x && seg.y === newFood.y);
+                }
+
+                food = newFood;
+            }
+
+            function drawSnake() {
+                snake.forEach((seg, i) => {
+                    ctx.fillStyle = i === 0 ? '#0f380f' : '#306230';
+                    ctx.strokeStyle = '#0f380f';
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
+                    ctx.strokeRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
+                });
+            }
+
+            function drawFood() {
+                ctx.fillStyle = '#0f380f';
+                ctx.strokeStyle = '#0f380f';
+                ctx.lineWidth = 1;
+                const padding = 4;
+                ctx.fillRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
+                ctx.strokeRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
+            }
+
+            function draw() {
+                ctx.fillStyle = '#9bbc0f';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                drawFood();
+                drawSnake();
+            }
+
+            function moveSnake() {
+                direction = nextDirection;
+                const head = snake[0];
+                const delta = directions[direction];
+                const newHead = {
+                    x: head.x + delta.x,
+                    y: head.y + delta.y
+                };
+
+                if (newHead.x === food.x && newHead.y === food.y) {
+                    snake.unshift(newHead);
+                    score += POINTS_PER_FOOD;
+                    scoreEl.textContent = score;
+                    AudioSystem.eat();
+
+                    const newLevel = Math.min(100, Math.floor(score / POINTS_PER_LEVEL) + 1);
+                    if (newLevel > level) {
+                        level = newLevel;
+                        showLevelUp();
+                    }
+
+                    spawnFood();
+                } else {
+                    snake.unshift(newHead);
+                    snake.pop();
+                }
+            }
+
+            function checkCollision() {
+                const head = snake[0];
+
+                if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+                    return true;
+                }
+
+                for (let i = 1; i < snake.length; i++) {
+                    if (head.x === snake[i].x && head.y === snake[i].y) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            function endGame() {
+                AudioSystem.gameOver();
+                gameOver = true;
+                clearInterval(gameLoopId);
+                gameLoopId = null;
+                finalScoreEl.textContent = score;
+                finalLevelEl.textContent = level;
+                if (RecordeSystem.isRecorde(score)) {
+                    const name = prompt('Novo recorde! Digite seu nome:', '') || 'Anônimo';
+                    RecordeSystem.set(score, name);
+                }
+                updateRecordeDisplay();
+                gameOverOverlay.style.display = 'flex';
+                restartBtn.style.display = 'inline-block';
+            }
+
+            function tick() {
+                if (gameOver || levelUpPaused) return;
+
+                moveSnake();
+
+                if (checkCollision()) {
+                    endGame();
+                    return;
+                }
+
+                draw();
+            }
+
+            function startGame() {
+                initGame();
+                AudioSystem.start();
+                draw();
+                gameLoopId = setInterval(tick, gameSpeed);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (gameOver) return;
+
+                const key = e.key.toLowerCase();
+                let newDir = null;
+
+                if (key === 'w') newDir = 'up';
+                else if (key === 's') newDir = 'down';
+                else if (key === 'a') newDir = 'left';
+                else if (key === 'd') newDir = 'right';
+
+                if (newDir && newDir !== opposite[direction]) {
+                    nextDirection = newDir;
+                    e.preventDefault();
+                }
+            });
+
+            restartBtn.addEventListener('click', startGame);
+            restartBtnOverlay.addEventListener('click', startGame);
+
+            updateRecordeDisplay();
+            startGame();
+        })();
+    </script>
+</body>
+</html>
