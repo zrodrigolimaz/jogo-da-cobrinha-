@@ -400,27 +400,13 @@
             flex-shrink: 0;
         }
 
-        .legend-food { background: #0f380f; border-radius: 2px; }
-        .legend-food-golden { background: #ffd700; border-radius: 2px; }
-        .legend-food-poison { background: #8b0000; border-radius: 2px; }
-        .legend-food-combo { background: #9370db; border-radius: 2px; }
-
-        .legend-obstacle {
-            background: #5c4033;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        .legend-sprite {
+            width: clamp(14px, 2vw, 18px);
+            height: clamp(14px, 2vw, 18px);
+            flex-shrink: 0;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
-
-        .legend-dangerous {
-            background: #8b0000;
-            border-radius: 2px;
-        }
-
-        .legend-buff-sm { background: #6a0dad; border-radius: 2px; }
-        .legend-buff-dp { background: #ffd700; border-radius: 2px; }
-        .legend-buff-prot { background: #1e90ff; border-radius: 2px; }
-        .legend-buff-shield { background: #00bfff; border-radius: 2px; }
-        .legend-buff-shrink { background: #ff6347; border-radius: 2px; }
-        .legend-buff-magnet { background: #ff00ff; border-radius: 2px; }
 
         @media (max-width: 600px) {
             .game-layout {
@@ -469,6 +455,9 @@
                     <p>ESC para continuar</p>
                 </div>
                 <div id="shieldIcon" style="display: none;" title="Shield ativo"></div>
+                <div id="loadingOverlay" style="display: flex; position: absolute; inset: 0; z-index: 20; background: rgba(15, 56, 15, 0.95); flex-direction: column; justify-content: center; align-items: center; color: #9bbc0f; border-radius: 8px;">
+                    <p style="font-size: 0.6rem; margin-bottom: 12px;">Carregando...</p>
+                </div>
                 <div id="gameOverOverlay" style="display: none;">
                     <h2>Game Over!</h2>
                     <p>Pontuação final: <span id="finalScore">0</span></p>
@@ -490,54 +479,18 @@
                 <div id="buffsDisplay" class="buffs-display"></div>
                 <div class="legend">
                     <div class="legend-title">Legenda</div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-food"></span>
-                        <span>Comida</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-food-golden"></span>
-                        <span>Maçã dourada</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-food-poison"></span>
-                        <span>Venenosa</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-food-combo"></span>
-                        <span>Combo</span>
-                    </div>
-                    <div class="legend-item" id="legendObstacle" style="display:none">
-                        <span class="legend-icon legend-obstacle"></span>
-                        <span>Obstáculo</span>
-                    </div>
-                    <div class="legend-item" id="legendDangerous" style="display:none">
-                        <span class="legend-icon legend-dangerous"></span>
-                        <span>Obstáculo perigoso</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-sm"></span>
-                        <span>Slow Motion</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-dp"></span>
-                        <span>Double Points</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-prot"></span>
-                        <span>Protection</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-shield"></span>
-                        <span>Shield</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-shrink"></span>
-                        <span>Shrink</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-icon legend-buff-magnet"></span>
-                        <span>Magnet</span>
-                    </div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="apple" alt="Comida"><span>Comida</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="apple_golden" alt="Maçã dourada"><span>Maçã dourada</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="poison" alt="Venenosa"><span>Venenosa</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="combo" alt="Combo"><span>Combo</span></div>
+                    <div class="legend-item" id="legendObstacle" style="display:none"><img class="legend-sprite" data-sprite="rock" alt="Obstáculo"><span>Obstáculo</span></div>
+                    <div class="legend-item" id="legendDangerous" style="display:none"><img class="legend-sprite" data-sprite="danger" alt="Perigoso"><span>Obstáculo perigoso</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="slow" alt="Slow"><span>Slow Motion</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="double" alt="2x"><span>Double Points</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="protection" alt="Prot"><span>Protection</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="shield" alt="Shield"><span>Shield</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="shrink" alt="Shrink"><span>Shrink</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="magnet" alt="Magnet"><span>Magnet</span></div>
                 </div>
                 <button id="restartBtn" style="display: none;">Reiniciar</button>
             </div>
@@ -547,6 +500,63 @@
 
     <script>
         (function() {
+            var SPRITES = {};
+            var SPRITE_SVG = {
+                apple: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="15" r="12" fill="#228B22" stroke="#2d5a2d" stroke-width="1"/><rect x="14" y="2" width="2" height="5" fill="#8B4513" rx="1"/><ellipse cx="18" cy="6" rx="3" ry="2" fill="#228B22" transform="rotate(-30 18 6)"/></svg>',
+                apple_golden: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="15" r="12" fill="#FFD700" stroke="#B8860B" stroke-width="1"/><rect x="14" y="2" width="2" height="5" fill="#8B4513" rx="1"/><ellipse cx="18" cy="6" rx="3" ry="2" fill="#FFD700" transform="rotate(-30 18 6)"/><circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.5)"/></svg>',
+                poison: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="10" y="10" width="12" height="18" rx="2" fill="#8B0000" stroke="#5c0000"/><rect x="14" y="4" width="4" height="8" fill="#8B0000" stroke="#5c0000"/><circle cx="16" cy="16" r="2" fill="#fff" opacity="0.6"/><path d="M14 22 L18 22" stroke="#fff" stroke-width="1" opacity="0.8"/></svg>',
+                combo: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 19,12 28,12 21,18 24,26 16,22 8,26 11,18 4,12 13,12" fill="#9370DB" stroke="#4b0082" stroke-width="1"/><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.6"/></svg>',
+                magnet: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M6 6 L6 14 Q6 22 16 22 Q26 22 26 14 L26 6" fill="none" stroke="#FF00FF" stroke-width="3" stroke-linecap="round"/><rect x="5" y="4" width="5" height="4" fill="#e600e6" rx="1"/><rect x="22" y="4" width="5" height="4" fill="#e600e6" rx="1"/><rect x="13" y="18" width="6" height="6" fill="#FF00FF" rx="1"/></svg>',
+                shield: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2 L28 8 L28 16 Q28 24 16 30 Q4 24 4 16 L4 8 Z" fill="#00BFFF" stroke="#0080a0" stroke-width="1"/><path d="M16 6 L24 10 L24 16 Q24 22 16 26 Q8 22 8 16 L8 10 Z" fill="rgba(255,255,255,0.3)"/></svg>',
+                shrink: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FF6347" stroke="#c05030"/><rect x="8" y="14" width="16" height="4" rx="1" fill="#fff"/></svg>',
+                slow: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#6a0dad" stroke="#4a0070" stroke-width="1"/><line x1="16" y1="16" x2="16" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="16" x2="20" y2="14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="16" r="1.5" fill="#fff"/></svg>',
+                double: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,3 19,11 28,11 21,17 24,25 16,21 8,25 11,17 4,11 13,11" fill="#FFD700" stroke="#B8860B" stroke-width="1"/><circle cx="16" cy="14" r="2" fill="#fff" opacity="0.7"/></svg>',
+                protection: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2 L28 8 L28 16 Q28 24 16 30 Q4 24 4 16 L4 8 Z" fill="#1E90FF" stroke="#0066aa" stroke-width="1"/><path d="M16 6 L24 10 L24 16 Q24 22 16 26 Q8 22 8 16 L8 10 Z" fill="rgba(255,255,255,0.4)"/></svg>',
+                rock: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><ellipse cx="16" cy="18" rx="12" ry="10" fill="#5c4033" stroke="#3d2e22"/><path d="M8 14 Q12 10 16 12 Q20 8 24 14 Q22 18 16 20 Q10 18 8 14" fill="#4a3528"/><ellipse cx="12" cy="16" rx="3" ry="2" fill="#6b5344"/></svg>',
+                danger: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="18" r="10" fill="#8B0000" stroke="#5c0000"/><circle cx="12" cy="15" r="2" fill="#fff"/><circle cx="20" cy="15" r="2" fill="#fff"/><path d="M10 22 Q16 26 22 22" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M14 6 L18 6 L19 12 L13 12 Z" fill="#ff4444"/><circle cx="16" cy="9" r="1" fill="#fff"/></svg>'
+            };
+
+            var SPRITE_PATHS = { apple: 'sprites/apple.png', apple_golden: 'sprites/apple_golden.png', poison: 'sprites/poison.png', combo: 'sprites/combo.png', magnet: 'sprites/magnet.png', shield: 'sprites/shield.png', shrink: 'sprites/shrink.png', slow: 'sprites/slow.png', double: 'sprites/double.png', protection: 'sprites/protection.png', rock: 'sprites/rock.png', danger: 'sprites/danger.png' };
+
+            function loadSprites(callback) {
+                var keys = Object.keys(SPRITE_SVG);
+                var pending = keys.length;
+                if (pending === 0) { callback(); return; }
+                keys.forEach(function(key) {
+                    var img = new Image();
+                    img.onload = function() { SPRITES[key] = img; if (--pending === 0) callback(); };
+                    img.onerror = function() {
+                        var svgImg = new Image();
+                        svgImg.onload = function() { SPRITES[key] = svgImg; if (--pending === 0) callback(); };
+                        svgImg.onerror = function() { if (--pending === 0) callback(); };
+                        svgImg.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(SPRITE_SVG[key])));
+                    };
+                    img.src = (SPRITE_PATHS[key] || 'sprites/' + key + '.png');
+                });
+            }
+
+            function initLegendSprites() {
+                document.querySelectorAll('.legend-sprite[data-sprite]').forEach(function(el) {
+                    var key = el.getAttribute('data-sprite');
+                    if (SPRITE_SVG[key]) {
+                        el.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(SPRITE_SVG[key])));
+                    }
+                });
+            }
+
+            function drawSprite(key, x, y, size) {
+                var img = SPRITES[key];
+                if (img && img.complete) {
+                    ctx.drawImage(img, x, y, size, size);
+                } else {
+                    ctx.fillStyle = '#0f380f';
+                    ctx.strokeStyle = '#2d5a2d';
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(x, y, size, size);
+                    ctx.strokeRect(x, y, size, size);
+                }
+            }
+
             const AudioSystem = (function() {
                 let audioCtx = null;
                 const bgMusicTracks = ['03_Elia.mp3', '04_Atum.mp3', 'Theme_RuleCastle.mp3'];
@@ -691,6 +701,7 @@
             const gameOverOverlay = document.getElementById('gameOverOverlay');
             const pauseOverlay = document.getElementById('pauseOverlay');
             const shieldIcon = document.getElementById('shieldIcon');
+            const loadingOverlay = document.getElementById('loadingOverlay');
             const canvasWrapper = document.querySelector('.canvas-wrapper');
             const volumeSlider = document.getElementById('volumeSlider');
             const volumeValueEl = document.getElementById('volumeValue');
@@ -1205,74 +1216,40 @@
 
             function drawObstacles() {
                 const cs = getCellSize();
-                obstacles.forEach(obs => {
-                    const cx = obs.x * cs + cs / 2;
-                    const cy = obs.y * cs + cs / 2;
-                    const s = cs / 2 - 2;
-                    ctx.fillStyle = '#5c4033';
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy - s);
-                    ctx.lineTo(cx + s, cy);
-                    ctx.lineTo(cx, cy + s);
-                    ctx.lineTo(cx - s, cy);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.strokeStyle = '#3d2e22';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
+                const padding = 2;
+                const size = cs - padding * 2;
+                obstacles.forEach(function(obs) {
+                    drawSprite('rock', obs.x * cs + padding, obs.y * cs + padding, size);
                 });
             }
 
             function drawDangerousObstacles() {
                 const cs = getCellSize();
-                const padding = 3;
-                dangerousObstacles.forEach(obs => {
-                    const x = obs.x * cs + padding;
-                    const y = obs.y * cs + padding;
-                    const size = cs - padding * 2;
-                    ctx.fillStyle = '#8b0000';
-                    ctx.fillRect(x, y, size, size);
-                    ctx.strokeStyle = '#5c0000';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y, size, size);
+                const padding = 2;
+                const size = cs - padding * 2;
+                dangerousObstacles.forEach(function(obs) {
+                    drawSprite('danger', obs.x * cs + padding, obs.y * cs + padding, size);
                 });
             }
 
             function drawFood() {
                 const cs = getCellSize();
-                const padding = 4;
-                const colors = { normal: '#0f380f', golden: '#ffd700', poison: '#8b0000', combo: '#9370db' };
-                const strokeColors = { normal: '#0f380f', golden: '#b8860b', poison: '#5c0000', combo: '#4b0082' };
-                const t = food.type || 'normal';
-                ctx.fillStyle = colors[t];
-                ctx.strokeStyle = strokeColors[t];
-                ctx.lineWidth = 1;
-                ctx.fillRect(food.x * cs + padding, food.y * cs + padding, cs - padding * 2, cs - padding * 2);
-                ctx.strokeRect(food.x * cs + padding, food.y * cs + padding, cs - padding * 2, cs - padding * 2);
-                if (t === 'combo') {
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.fillRect(food.x * cs + padding + 2, food.y * cs + padding + 2, (cs - padding * 2) / 2, (cs - padding * 2) / 2);
-                }
+                const padding = 2;
+                const size = cs - padding * 2;
+                var t = food.type || 'normal';
+                var key = t === 'normal' ? 'apple' : (t === 'golden' ? 'apple_golden' : (t === 'poison' ? 'poison' : 'combo'));
+                drawSprite(key, food.x * cs + padding, food.y * cs + padding, size);
             }
+
+            var BUFF_TO_SPRITE = { slowMotion: 'slow', doublePoints: 'double', protection: 'protection', shield: 'shield', shrink: 'shrink', magnet: 'magnet' };
 
             function drawBuff() {
                 if (!buffItem) return;
                 const cs = getCellSize();
-                const cx = buffItem.x * cs + cs / 2;
-                const cy = buffItem.y * cs + cs / 2;
-                const s = cs / 2 - 2;
-                const color = BUFF_COLORS[buffItem.type] || '#888';
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.moveTo(cx, cy - s);
-                ctx.lineTo(cx + s, cy);
-                ctx.lineTo(cx, cy + s);
-                ctx.lineTo(cx - s, cy);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.stroke();
+                const padding = 2;
+                const size = cs - padding * 2;
+                var key = BUFF_TO_SPRITE[buffItem.type] || 'shield';
+                drawSprite(key, buffItem.x * cs + padding, buffItem.y * cs + padding, size);
             }
 
             function draw() {
@@ -1538,11 +1515,14 @@
             });
 
             updateRecordeDisplay();
-            startGame();
-
-            requestAnimationFrame(function() {
-                resizeCanvas();
-                draw();
+            initLegendSprites();
+            loadSprites(function() {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                startGame();
+                requestAnimationFrame(function() {
+                    resizeCanvas();
+                    draw();
+                });
             });
         })();
     </script>

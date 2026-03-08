@@ -1,0 +1,10 @@
+Ícones de comida do pack CC0 Food Icons (OpenGameArt.org)
+https://opengameart.org/content/cc0-food-icons
+
+Licença: Creative Commons Zero (CC0)
+- apple.png: maçã (32x32/fruit/apple.png)
+- apple_golden.png: laranja (32x32/fruit/orange.png)
+- combo.png: uvas (32x32/fruit/grapes.png)
+- poison.png: cogumelo (32x32/misc/mushroom.png)
+
+Buffs (magnet, shield, shrink, etc.): ícones SVG embutidos no jogo.
