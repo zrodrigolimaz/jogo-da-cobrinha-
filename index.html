@@ -12,49 +12,65 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Press Start 2P', 'Courier New', monospace;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background: #1a1a1a;
         }
 
         .game-container {
+            position: fixed;
+            inset: 0;
             background: #2a2a2a;
-            padding: 24px;
-            border-radius: 24px;
-            border: 3px solid #1a1a1a;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: clamp(8px, 1.2vw, 16px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: clamp(8px, 1.5vh, 16px);
+            flex-shrink: 0;
         }
 
         h1 {
             color: #9bbc0f;
-            font-size: 0.75rem;
+            font-size: clamp(0.6rem, 1.5vw, 0.85rem);
         }
 
         .game-layout {
             display: flex;
-            align-items: flex-start;
-            gap: 20px;
+            align-items: stretch;
+            gap: clamp(12px, 2vw, 24px);
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .info-panel {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            min-width: 180px;
+            gap: clamp(10px, 1.2vh, 20px);
+            width: clamp(160px, 18vw, 260px);
+            min-width: 160px;
+            max-width: 260px;
+            flex-shrink: 0;
+            padding: clamp(12px, 1.5vw, 20px);
+            background: rgba(15, 56, 15, 0.4);
+            border: 1px solid #306230;
+            border-radius: 8px;
+            overflow-y: auto;
         }
 
         .score-display {
             color: #9bbc0f;
-            font-size: 0.6rem;
+            font-size: clamp(0.5rem, 1.2vw, 0.65rem);
         }
 
         .score-display span {
@@ -63,7 +79,7 @@
 
         .record-display {
             color: #9bbc0f;
-            font-size: 0.5rem;
+            font-size: clamp(0.45rem, 1vw, 0.55rem);
         }
 
         .record-display span {
@@ -72,7 +88,7 @@
 
         .level-display {
             color: #9bbc0f;
-            font-size: 0.5rem;
+            font-size: clamp(0.45rem, 1vw, 0.55rem);
         }
 
         .level-display span {
@@ -80,6 +96,33 @@
         }
 
         #levelUpOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 15;
+            background: rgba(15, 56, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2px;
+            color: #9bbc0f;
+            transition: opacity 0.3s ease;
+        }
+
+        #levelUpOverlay h2 {
+            color: #9bbc0f;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        #levelUpOverlay p {
+            font-size: 0.6rem;
+        }
+
+        #pauseOverlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -94,26 +137,52 @@
             color: #9bbc0f;
         }
 
-        #levelUpOverlay h2 {
+        #pauseOverlay h2 {
             color: #9bbc0f;
             font-size: 1rem;
             margin-bottom: 12px;
         }
 
-        #levelUpOverlay p {
+        #pauseOverlay p {
             font-size: 0.6rem;
         }
 
+        #shieldIcon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: #1e90ff;
+            border: 2px solid #306230;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        #shieldIcon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border: 2px solid #306230;
+            border-radius: 2px;
+            background: rgba(30, 144, 255, 0.5);
+        }
+
         #restartBtn {
-            padding: 8px 16px;
-            font-size: 0.5rem;
+            padding: clamp(6px, 0.8vw, 10px) clamp(12px, 1.5vw, 18px);
+            font-size: clamp(0.4rem, 0.9vw, 0.5rem);
             font-family: 'Press Start 2P', 'Courier New', monospace;
             color: #9bbc0f;
             background: #0f380f;
             border: 2px solid #306230;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: background 0.2s;
+            margin-top: auto;
         }
 
         #restartBtn:hover {
@@ -125,12 +194,59 @@
             outline-offset: 2px;
         }
 
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .volume-control label {
+            color: #9bbc0f;
+            font-size: clamp(0.4rem, 0.9vw, 0.5rem);
+        }
+
+        .volume-control input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0f380f;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #9bbc0f;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #306230;
+        }
+
+        .volume-control input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #9bbc0f;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #306230;
+        }
+
         .canvas-wrapper {
             position: relative;
-            display: inline-block;
+            flex: 1;
+            transition: transform 0.05s linear;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 0;
+            min-height: 0;
             background: #0f380f;
-            padding: 12px;
-            border-radius: 4px;
+            padding: clamp(8px, 1vw, 16px);
+            border-radius: 8px;
         }
 
         #gameCanvas {
@@ -169,12 +285,12 @@
 
         #gameOverOverlay button {
             font-family: 'Press Start 2P', 'Courier New', monospace;
-            padding: 8px 16px;
-            font-size: 0.5rem;
+            padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px);
+            font-size: clamp(0.45rem, 1vw, 0.55rem);
             color: #9bbc0f;
             background: #0f380f;
             border: 2px solid #306230;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
         }
 
@@ -183,15 +299,135 @@
         }
 
         .controls-hint {
-            margin-top: 12px;
+            margin-top: clamp(6px, 1vh, 12px);
             color: #306230;
-            font-size: 0.4rem;
+            font-size: clamp(0.35rem, 0.8vw, 0.45rem);
+            flex-shrink: 0;
+            text-align: center;
         }
 
         .info-panel .score-display,
         .info-panel .level-display,
-        .info-panel .record-display {
+        .info-panel .record-display,
+        .info-panel .time-display,
+        .info-panel .speed-display {
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .speed-display {
+            color: #9bbc0f;
+            font-size: clamp(0.45rem, 1vw, 0.55rem);
+        }
+
+        .speed-display span {
+            color: #9bbc0f;
+        }
+
+        .time-display {
+            color: #9bbc0f;
+            font-size: clamp(0.45rem, 1vw, 0.55rem);
+        }
+
+        .time-display span {
+            color: #9bbc0f;
+        }
+
+        .buffs-display {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: clamp(0.35rem, 0.9vw, 0.45rem);
+            color: #9bbc0f;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .buff-timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .buff-timer-icon {
+            width: clamp(8px, 1.2vw, 12px);
+            height: clamp(8px, 1.2vw, 12px);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legend {
+            margin-top: auto;
+            padding: clamp(8px, 1vw, 12px);
+            border: 1px solid #306230;
+            border-radius: 6px;
+            font-size: clamp(0.35rem, 0.85vw, 0.45rem);
+            color: #9bbc0f;
+            background: rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .legend-title {
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: clamp(0.4rem, 0.95vw, 0.5rem);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-icon {
+            display: inline-block;
+            width: clamp(10px, 1.5vw, 14px);
+            height: clamp(10px, 1.5vw, 14px);
+            flex-shrink: 0;
+        }
+
+        .legend-sprite {
+            width: clamp(14px, 2vw, 18px);
+            height: clamp(14px, 2vw, 18px);
+            flex-shrink: 0;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        @media (max-width: 600px) {
+            .game-layout {
+                flex-direction: column;
+            }
+            .info-panel {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-content: flex-start;
+            }
+            .info-panel .score-display,
+            .info-panel .level-display,
+            .info-panel .time-display,
+            .info-panel .record-display,
+            .info-panel .speed-display {
+                flex: 0 0 auto;
+            }
+            .legend {
+                flex: 1 1 100%;
+                margin-top: 8px;
+            }
+            .buffs-display {
+                flex: 1 1 100%;
+            }
         }
     </style>
 </head>
@@ -207,77 +443,246 @@
                     <h2>Level Up!</h2>
                     <p>Nível <span id="levelUpNumber">2</span></p>
                 </div>
+                <div id="pauseOverlay" style="display: none;">
+                    <h2>Pausado</h2>
+                    <p>ESC para continuar</p>
+                </div>
+                <div id="shieldIcon" style="display: none;" title="Shield ativo"></div>
+                <div id="loadingOverlay" style="display: flex; position: absolute; inset: 0; z-index: 20; background: rgba(15, 56, 15, 0.95); flex-direction: column; justify-content: center; align-items: center; color: #9bbc0f; border-radius: 8px;">
+                    <p style="font-size: 0.6rem; margin-bottom: 12px;">Carregando...</p>
+                </div>
                 <div id="gameOverOverlay" style="display: none;">
                     <h2>Game Over!</h2>
                     <p>Pontuação final: <span id="finalScore">0</span></p>
                     <p>Nível alcançado: <span id="finalLevel">1</span></p>
+                    <p>Tempo: <span id="finalTime">0:00</span></p>
                     <button id="restartBtnOverlay">Reiniciar</button>
                 </div>
             </div>
             <div class="info-panel">
                 <div class="score-display">Placar: <span id="score">0</span></div>
                 <div class="level-display">Nível: <span id="level">1</span></div>
+                <div class="time-display">Tempo: <span id="gameTime">0:00</span></div>
                 <div class="record-display">Recorde: <span id="recordScore">--</span> <span id="recordName"></span></div>
+                <div class="speed-display">Velocidade: <span id="speed">1.0</span>x</div>
+                <div class="volume-control">
+                    <label for="volumeSlider">Volume: <span id="volumeValue">50</span>%</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                </div>
+                <div id="buffsDisplay" class="buffs-display"></div>
+                <div class="legend">
+                    <div class="legend-title">Legenda</div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="apple" alt="Comida"><span>Comida</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="apple_golden" alt="Maçã dourada"><span>Maçã dourada</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="poison" alt="Venenosa"><span>Venenosa</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="combo" alt="Combo"><span>Combo</span></div>
+                    <div class="legend-item" id="legendObstacle" style="display:none"><img class="legend-sprite" data-sprite="rock" alt="Obstáculo"><span>Obstáculo</span></div>
+                    <div class="legend-item" id="legendDangerous" style="display:none"><img class="legend-sprite" data-sprite="danger" alt="Perigoso"><span>Obstáculo perigoso</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="slow" alt="Slow"><span>Slow Motion</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="double" alt="2x"><span>Double Points</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="protection" alt="Prot"><span>Protection</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="shield" alt="Shield"><span>Shield</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="shrink" alt="Shrink"><span>Shrink</span></div>
+                    <div class="legend-item"><img class="legend-sprite" data-sprite="magnet" alt="Magnet"><span>Magnet</span></div>
+                </div>
                 <button id="restartBtn" style="display: none;">Reiniciar</button>
             </div>
         </div>
-        <p class="controls-hint">Use W, A, S, D para movimentar</p>
+        <p class="controls-hint">Use W, A, S, D ou setas para movimentar. ESC para pausar.</p>
     </div>
 
     <script>
         (function() {
+            var SPRITES = {};
+            var SPRITE_SVG = {
+                apple: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="15" r="12" fill="#228B22" stroke="#2d5a2d" stroke-width="1"/><rect x="14" y="2" width="2" height="5" fill="#8B4513" rx="1"/><ellipse cx="18" cy="6" rx="3" ry="2" fill="#228B22" transform="rotate(-30 18 6)"/></svg>',
+                apple_golden: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="15" r="12" fill="#FFD700" stroke="#B8860B" stroke-width="1"/><rect x="14" y="2" width="2" height="5" fill="#8B4513" rx="1"/><ellipse cx="18" cy="6" rx="3" ry="2" fill="#FFD700" transform="rotate(-30 18 6)"/><circle cx="12" cy="12" r="2" fill="rgba(255,255,255,0.5)"/></svg>',
+                poison: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="10" y="10" width="12" height="18" rx="2" fill="#8B0000" stroke="#5c0000"/><rect x="14" y="4" width="4" height="8" fill="#8B0000" stroke="#5c0000"/><circle cx="16" cy="16" r="2" fill="#fff" opacity="0.6"/><path d="M14 22 L18 22" stroke="#fff" stroke-width="1" opacity="0.8"/></svg>',
+                combo: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 19,12 28,12 21,18 24,26 16,22 8,26 11,18 4,12 13,12" fill="#9370DB" stroke="#4b0082" stroke-width="1"/><circle cx="16" cy="16" r="3" fill="#fff" opacity="0.6"/></svg>',
+                magnet: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M6 6 L6 14 Q6 22 16 22 Q26 22 26 14 L26 6" fill="none" stroke="#FF00FF" stroke-width="3" stroke-linecap="round"/><rect x="5" y="4" width="5" height="4" fill="#e600e6" rx="1"/><rect x="22" y="4" width="5" height="4" fill="#e600e6" rx="1"/><rect x="13" y="18" width="6" height="6" fill="#FF00FF" rx="1"/></svg>',
+                shield: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2 L28 8 L28 16 Q28 24 16 30 Q4 24 4 16 L4 8 Z" fill="#00BFFF" stroke="#0080a0" stroke-width="1"/><path d="M16 6 L24 10 L24 16 Q24 22 16 26 Q8 22 8 16 L8 10 Z" fill="rgba(255,255,255,0.3)"/></svg>',
+                shrink: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#FF6347" stroke="#c05030"/><rect x="8" y="14" width="16" height="4" rx="1" fill="#fff"/></svg>',
+                slow: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="#6a0dad" stroke="#4a0070" stroke-width="1"/><line x1="16" y1="16" x2="16" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="16" x2="20" y2="14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="16" cy="16" r="1.5" fill="#fff"/></svg>',
+                double: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="16,3 19,11 28,11 21,17 24,25 16,21 8,25 11,17 4,11 13,11" fill="#FFD700" stroke="#B8860B" stroke-width="1"/><circle cx="16" cy="14" r="2" fill="#fff" opacity="0.7"/></svg>',
+                protection: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2 L28 8 L28 16 Q28 24 16 30 Q4 24 4 16 L4 8 Z" fill="#1E90FF" stroke="#0066aa" stroke-width="1"/><path d="M16 6 L24 10 L24 16 Q24 22 16 26 Q8 22 8 16 L8 10 Z" fill="rgba(255,255,255,0.4)"/></svg>',
+                rock: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><ellipse cx="16" cy="18" rx="12" ry="10" fill="#5c4033" stroke="#3d2e22"/><path d="M8 14 Q12 10 16 12 Q20 8 24 14 Q22 18 16 20 Q10 18 8 14" fill="#4a3528"/><ellipse cx="12" cy="16" rx="3" ry="2" fill="#6b5344"/></svg>',
+                danger: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="18" r="10" fill="#8B0000" stroke="#5c0000"/><circle cx="12" cy="15" r="2" fill="#fff"/><circle cx="20" cy="15" r="2" fill="#fff"/><path d="M10 22 Q16 26 22 22" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M14 6 L18 6 L19 12 L13 12 Z" fill="#ff4444"/><circle cx="16" cy="9" r="1" fill="#fff"/></svg>'
+            };
+
+            var SPRITE_PATHS = { apple: 'sprites/apple.png', apple_golden: 'sprites/apple_golden.png', poison: 'sprites/poison.png', combo: 'sprites/combo.png', magnet: 'sprites/magnet.png', shield: 'sprites/shield.png', shrink: 'sprites/shrink.png', slow: 'sprites/slow.png', double: 'sprites/double.png', protection: 'sprites/protection.png', rock: 'sprites/rock.png', danger: 'sprites/danger.png' };
+
+            function loadSprites(callback) {
+                var keys = Object.keys(SPRITE_SVG);
+                var pending = keys.length;
+                if (pending === 0) { callback(); return; }
+                keys.forEach(function(key) {
+                    var img = new Image();
+                    img.onload = function() { SPRITES[key] = img; if (--pending === 0) callback(); };
+                    img.onerror = function() {
+                        var svgImg = new Image();
+                        svgImg.onload = function() { SPRITES[key] = svgImg; if (--pending === 0) callback(); };
+                        svgImg.onerror = function() { if (--pending === 0) callback(); };
+                        svgImg.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(SPRITE_SVG[key])));
+                    };
+                    img.src = (SPRITE_PATHS[key] || 'sprites/' + key + '.png');
+                });
+            }
+
+            var LEGEND_USE_PNG = { apple: 1, apple_golden: 1, poison: 1, combo: 1 };
+
+            function initLegendSprites() {
+                document.querySelectorAll('.legend-sprite[data-sprite]').forEach(function(el) {
+                    var key = el.getAttribute('data-sprite');
+                    if (LEGEND_USE_PNG[key] && SPRITE_PATHS[key]) {
+                        el.src = SPRITE_PATHS[key];
+                    } else if (SPRITE_SVG[key]) {
+                        el.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(SPRITE_SVG[key])));
+                    }
+                });
+            }
+
+            function drawSprite(key, x, y, size) {
+                var img = SPRITES[key];
+                if (img && img.complete) {
+                    ctx.drawImage(img, x, y, size, size);
+                } else {
+                    ctx.fillStyle = '#0f380f';
+                    ctx.strokeStyle = '#2d5a2d';
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(x, y, size, size);
+                    ctx.strokeRect(x, y, size, size);
+                }
+            }
+
             const AudioSystem = (function() {
                 let audioCtx = null;
+                const bgMusicTracks = ['03_Elia.mp3', '04_Atum.mp3', 'Theme_RuleCastle.mp3'];
+                let bgAudio = null;
+                let bgIndex = 0;
 
                 function getContext() {
                     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     return audioCtx;
                 }
 
-                function playTone(freq, duration, type) {
-                    const ctx = getContext();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.frequency.value = freq;
-                    osc.type = type || 'square';
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + duration);
+                function ensureRunning() {
+                    try {
+                        const ctx = getContext();
+                        if (ctx.state === 'suspended') ctx.resume();
+                    } catch (e) {}
                 }
 
-                return {
-                    eat: function() { playTone(800, 0.08, 'square'); },
-                    gameOver: function() {
+                function playNextBgTrack() {
+                    if (!bgAudio) return;
+                    bgIndex = (bgIndex + 1) % bgMusicTracks.length;
+                    bgAudio.src = bgMusicTracks[bgIndex];
+                    bgAudio.play().catch(function() {});
+                }
+
+                function playTone(freq, duration, type) {
+                    try {
+                        ensureRunning();
                         const ctx = getContext();
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-                        osc.type = 'sawtooth';
-                        gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                        osc.frequency.setValueAtTime(400, ctx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+                        osc.frequency.value = freq;
+                        osc.type = type || 'square';
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
                         osc.start(ctx.currentTime);
-                        osc.stop(ctx.currentTime + 0.3);
+                        osc.stop(ctx.currentTime + duration);
+                    } catch (e) {}
+                }
+
+                function playToneRamp(startFreq, endFreq, duration, type) {
+                    try {
+                        ensureRunning();
+                        const ctx = getContext();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = type || 'square';
+                        osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + duration);
+                    } catch (e) {}
+                }
+
+                return {
+                    eat: function() { playTone(800, 0.08, 'square'); },
+                    eatGolden: function() { playTone(1200, 0.1, 'sine'); },
+                    eatPoison: function() { playToneRamp(400, 150, 0.15, 'sawtooth'); },
+                    eatCombo: function(combo) { playTone(600 + combo * 100, 0.06 + combo * 0.01, 'square'); },
+                    gameOver: function() {
+                        try {
+                            ensureRunning();
+                            const ctx = getContext();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.type = 'sawtooth';
+                            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                            osc.frequency.setValueAtTime(400, ctx.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+                            osc.start(ctx.currentTime);
+                            osc.stop(ctx.currentTime + 0.3);
+                        } catch (e) {}
                     },
                     start: function() { playTone(440, 0.05, 'sine'); },
                     unlock: function() {
                         const ctx = getContext();
                         if (ctx.state === 'suspended') ctx.resume();
+                    },
+                    bgMusicPlay: function() {
+                        try {
+                            if (bgAudio && !bgAudio.paused) return;
+                            if (bgAudio) {
+                                bgIndex = 0;
+                                bgAudio.src = bgMusicTracks[0];
+                                bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '50', 10) / 100);
+                                bgAudio.currentTime = 0;
+                                bgAudio.play().catch(function() {});
+                                return;
+                            }
+                            bgAudio = new Audio(bgMusicTracks[0]);
+                            bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '50', 10) / 100);
+                            bgAudio.loop = false;
+                            bgAudio.addEventListener('ended', playNextBgTrack);
+                            bgAudio.play().catch(function() {});
+                        } catch (e) {}
+                    },
+                    bgMusicStop: function() {
+                        try {
+                            if (bgAudio) {
+                                bgAudio.pause();
+                                bgAudio.currentTime = 0;
+                            }
+                        } catch (e) {}
+                    },
+                    setBgVolume: function(vol) {
+                        if (vol < 0) vol = 0;
+                        if (vol > 1) vol = 1;
+                        if (bgAudio) bgAudio.volume = vol;
                     }
                 };
             })();
 
             document.addEventListener('keydown', function unlockKey() {
                 AudioSystem.unlock();
-            }, { once: true });
+                if (!gameOver) AudioSystem.bgMusicPlay();
+            });
             document.addEventListener('click', function unlockClick() {
                 AudioSystem.unlock();
-            }, { once: true });
+                if (!gameOver) AudioSystem.bgMusicPlay();
+            });
 
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
@@ -285,18 +690,50 @@
             const levelEl = document.getElementById('level');
             const finalScoreEl = document.getElementById('finalScore');
             const finalLevelEl = document.getElementById('finalLevel');
+            const finalTimeEl = document.getElementById('finalTime');
+            const gameTimeEl = document.getElementById('gameTime');
+            const buffsDisplayEl = document.getElementById('buffsDisplay');
             const restartBtn = document.getElementById('restartBtn');
             const restartBtnOverlay = document.getElementById('restartBtnOverlay');
             const gameOverOverlay = document.getElementById('gameOverOverlay');
+            const pauseOverlay = document.getElementById('pauseOverlay');
+            const shieldIcon = document.getElementById('shieldIcon');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const canvasWrapper = document.querySelector('.canvas-wrapper');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeValueEl = document.getElementById('volumeValue');
 
-            const gridSize = 20;
-            const cellSize = canvas.width / gridSize;
+            const savedVolume = parseInt(localStorage.getItem('snakeBgVolume') || '50', 10);
+            if (volumeSlider) {
+                volumeSlider.value = savedVolume;
+                if (volumeValueEl) volumeValueEl.textContent = savedVolume;
+                volumeSlider.addEventListener('input', function() {
+                    const pct = parseInt(volumeSlider.value, 10);
+                    if (volumeValueEl) volumeValueEl.textContent = pct;
+                    localStorage.setItem('snakeBgVolume', String(pct));
+                    AudioSystem.setBgVolume(pct / 100);
+                });
+            }
+
+            const baseGridSize = 20;
+            let cellPx = 20;
+            let currentGridSize = 20;
 
             const INITIAL_SPEED = 150;
             const MIN_SPEED = 50;
             const POINTS_PER_FOOD = 10;
+            const POINTS_GOLDEN = 30;
             const POINTS_PER_LEVEL = 50;
-            const SPEED_INCREASE_PER_LEVEL = 0.25;
+            const SPEED_INCREASE_PER_LEVEL = 0.1;
+            const POINTS_POISON_PENALTY = 10;
+            const COMBO_WINDOW = 2000;
+            const COMBO_BONUS = 5;
+
+            const BUFF_TYPES = ['slowMotion', 'doublePoints', 'protection', 'shield', 'shrink', 'magnet'];
+            const BUFF_DURATIONS = { slowMotion: 20, doublePoints: 10, protection: 20, magnet: 15 };
+            const BUFF_COLORS = { slowMotion: '#6a0dad', doublePoints: '#ffd700', protection: '#1e90ff', shield: '#00bfff', shrink: '#ff6347', magnet: '#ff00ff' };
+            const BUFF_NAMES = { slowMotion: 'Slow', doublePoints: '2x', protection: 'Prot', shield: 'Shield', shrink: 'Shrink', magnet: 'Magnet' };
+            const BUFF_SPAWN_CHANCE = 0.6;
 
             const RecordeSystem = (function() {
                 const KEY = 'snakeRecorde';
@@ -324,8 +761,6 @@
             let food = { x: 0, y: 0 };
             let direction = 'right';
             let nextDirection = 'right';
-            let directionQueue = [];
-            const MAX_DIRECTION_QUEUE = 5;
             let score = 0;
             let level = 1;
             let gameSpeed = INITIAL_SPEED;
@@ -333,6 +768,23 @@
             let levelUpPaused = false;
             let gameLoopId = null;
             let obstacles = [];
+            let dangerousObstacles = [];
+            let buffItem = null;
+            let activeBuffs = {};
+            let protectionGraceTick = false;
+            let gameStartTime = 0;
+            let gamePaused = false;
+            let shieldActive = false;
+            let lastEatTime = 0;
+            let comboCount = 0;
+            let particles = [];
+            const MAX_PARTICLES = 50;
+            let shakeFrames = 0;
+            let shakeIntensity = 4;
+
+            const pressedKeys = new Map();
+            const directionQueue = [];
+            const MAX_QUEUE = 2;
 
             const directions = {
                 up: { x: 0, y: -1 },
@@ -347,6 +799,52 @@
                 left: 'right',
                 right: 'left'
             };
+
+            const keyToDir = {
+                w: 'up', s: 'down', a: 'left', d: 'right',
+                arrowup: 'up', arrowdown: 'down', arrowleft: 'left', arrowright: 'right'
+            };
+
+            function getNextDirectionFromInput() {
+                if (directionQueue.length > 0) {
+                    return directionQueue.shift();
+                }
+                const validDirs = [];
+                for (const [key, ts] of pressedKeys) {
+                    const dir = keyToDir[key];
+                    if (dir && dir !== opposite[direction]) {
+                        validDirs.push({ dir, ts });
+                    }
+                }
+                if (validDirs.length === 0) return nextDirection;
+                validDirs.sort((a, b) => b.ts - a.ts);
+                return validDirs[0].dir;
+            }
+
+            function enqueueDirection(dir) {
+                const ref = directionQueue.length > 0 ? directionQueue[directionQueue.length - 1] : direction;
+                if (dir !== opposite[ref] && directionQueue.length < MAX_QUEUE) {
+                    directionQueue.push(dir);
+                }
+            }
+
+            function resizeCanvas() {
+                const canvasWrapper = canvas.parentElement;
+                const style = getComputedStyle(canvasWrapper);
+                const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+                const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+                const availableWidth = canvasWrapper.clientWidth - padX;
+                const availableHeight = canvasWrapper.clientHeight - padY;
+                const availableSize = Math.max(0, Math.min(availableWidth, availableHeight));
+                cellPx = Math.max(10, Math.floor(availableSize / currentGridSize));
+                const size = currentGridSize * cellPx;
+                canvas.width = size;
+                canvas.height = size;
+            }
+
+            function getCellSize() {
+                return cellPx;
+            }
 
             function getSpeedForLevel(lvl) {
                 const multiplier = 1 + (lvl - 1) * SPEED_INCREASE_PER_LEVEL;
@@ -363,18 +861,32 @@
                 const levelUpNumber = document.getElementById('levelUpNumber');
                 levelUpNumber.textContent = level;
                 levelUpOverlay.style.display = 'flex';
+                levelUpOverlay.style.opacity = '1';
                 setTimeout(function() {
-                    levelUpOverlay.style.display = 'none';
-                    levelUpPaused = false;
-                    levelEl.textContent = level;
-                    gameSpeed = getSpeedForLevel(level);
-                    gameLoopId = setInterval(tick, gameSpeed);
+                    levelUpOverlay.style.opacity = '0';
+                    setTimeout(function() {
+                        levelUpOverlay.style.display = 'none';
+                        levelUpPaused = false;
+                        levelEl.textContent = level;
+                        gameSpeed = getSpeedForLevel(level);
+                        updateSpeedDisplay();
+                        updateLegendDisplay();
+                        gameLoopId = setInterval(tick, gameSpeed);
+                    }, 300);
                 }, 1500);
             }
 
             function initGame() {
-                const centerX = Math.floor(gridSize / 2);
-                const centerY = Math.floor(gridSize / 2);
+                currentGridSize = baseGridSize;
+                resizeCanvas();
+                pressedKeys.clear();
+                directionQueue.length = 0;
+                buffItem = null;
+                activeBuffs = {};
+                protectionGraceTick = false;
+                gameStartTime = Date.now();
+                const centerX = Math.floor(currentGridSize / 2);
+                const centerY = Math.floor(currentGridSize / 2);
                 snake = [
                     { x: centerX, y: centerY },
                     { x: centerX - 1, y: centerY },
@@ -382,21 +894,137 @@
                 ];
                 direction = 'right';
                 nextDirection = 'right';
-                directionQueue = [];
                 score = 0;
                 level = 1;
                 gameSpeed = getSpeedForLevel(1);
                 gameOver = false;
                 levelUpPaused = false;
+                gamePaused = false;
+                shieldActive = false;
+                lastEatTime = 0;
+                comboCount = 0;
+                particles = [];
+                shakeFrames = 0;
+                if (canvasWrapper) canvasWrapper.style.transform = 'translate(0, 0)';
                 obstacles = [];
+                dangerousObstacles = [];
                 spawnFood();
                 spawnObstacles();
                 scoreEl.textContent = score;
                 levelEl.textContent = level;
                 gameOverOverlay.style.display = 'none';
                 document.getElementById('levelUpOverlay').style.display = 'none';
+                pauseOverlay.style.display = 'none';
+                shieldIcon.style.display = 'none';
                 restartBtn.style.display = 'none';
                 updateRecordeDisplay();
+                updateSpeedDisplay();
+                updateLegendDisplay();
+                updateTimeDisplay();
+                updateBuffDisplay();
+                spawnBuff();
+            }
+
+            function isBuffPosition(x, y) {
+                return buffItem && buffItem.x === x && buffItem.y === y;
+            }
+
+            function spawnBuff() {
+                if (buffItem !== null || Math.random() >= BUFF_SPAWN_CHANCE) return;
+                const blocked = new Set();
+                snake.forEach(seg => blocked.add(seg.x + ',' + seg.y));
+                blocked.add(food.x + ',' + food.y);
+                obstacles.forEach(obs => blocked.add(obs.x + ',' + obs.y));
+                dangerousObstacles.forEach(obs => blocked.add(obs.x + ',' + obs.y));
+                let attempts = 0;
+                while (attempts < 100) {
+                    const x = Math.floor(Math.random() * currentGridSize);
+                    const y = Math.floor(Math.random() * currentGridSize);
+                    if (!blocked.has(x + ',' + y)) {
+                        const availableTypes = level >= 1 ? BUFF_TYPES : BUFF_TYPES.filter(t => t !== 'protection');
+                        buffItem = { x, y, type: availableTypes[Math.floor(Math.random() * availableTypes.length)] };
+                        return;
+                    }
+                    attempts++;
+                }
+            }
+
+            function applyBuff(type) {
+                buffItem = null;
+                if (type === 'shield') {
+                    shieldActive = true;
+                    if (shieldIcon) shieldIcon.style.display = 'block';
+                    spawnBuff();
+                    return;
+                }
+                if (type === 'shrink') {
+                    if (snake.length > 3) snake.pop();
+                    spawnBuff();
+                    return;
+                }
+                const duration = BUFF_DURATIONS[type] || 20;
+                activeBuffs[type] = Date.now() + duration * 1000;
+                if (type === 'slowMotion') {
+                    const newSpeed = Math.min(300, Math.floor(gameSpeed * 1.5));
+                    gameSpeed = newSpeed;
+                    if (gameLoopId) {
+                        clearInterval(gameLoopId);
+                        gameLoopId = setInterval(tick, gameSpeed);
+                    }
+                    updateSpeedDisplay();
+                }
+                spawnBuff();
+            }
+
+            function moveFoodTowardSnake() {
+                if (!activeBuffs.magnet || Date.now() >= activeBuffs.magnet) return;
+                const head = snake[0];
+                const dx = head.x - food.x;
+                const dy = head.y - food.y;
+                if (dx === 0 && dy === 0) return;
+                var nx = food.x;
+                var ny = food.y;
+                if (Math.abs(dx) >= Math.abs(dy)) {
+                    nx = food.x + (dx > 0 ? 1 : -1);
+                } else {
+                    ny = food.y + (dy > 0 ? 1 : -1);
+                }
+                if (nx >= 0 && nx < currentGridSize && ny >= 0 && ny < currentGridSize) {
+                    var blocked = isBlocked(nx, ny) || isOnDangerousObstacle(nx, ny) || (buffItem && buffItem.x === nx && buffItem.y === ny);
+                    if (!blocked) {
+                        for (var s = 0; s < snake.length; s++) {
+                            if (snake[s].x === nx && snake[s].y === ny) {
+                                if (s === 0) break;
+                                blocked = true;
+                                break;
+                            }
+                        }
+                        if (!blocked) {
+                            food.x = nx;
+                            food.y = ny;
+                        }
+                    }
+                }
+            }
+
+            function updateBuffs() {
+                protectionGraceTick = false;
+                const now = Date.now();
+                for (const type in activeBuffs) {
+                    if (now >= activeBuffs[type]) {
+                        delete activeBuffs[type];
+                        if (type === 'protection') {
+                            protectionGraceTick = true;
+                        } else                         if (type === 'slowMotion') {
+                            gameSpeed = getSpeedForLevel(level);
+                            if (gameLoopId) {
+                                clearInterval(gameLoopId);
+                                gameLoopId = setInterval(tick, gameSpeed);
+                            }
+                            updateSpeedDisplay();
+                        }
+                    }
+                }
             }
 
             function updateRecordeDisplay() {
@@ -405,84 +1033,214 @@
                 document.getElementById('recordName').textContent = r ? `(${r.name})` : '';
             }
 
+            function updateSpeedDisplay() {
+                document.getElementById('speed').textContent = (INITIAL_SPEED / gameSpeed).toFixed(1);
+            }
+
+            function formatTime(ms) {
+                const sec = Math.floor(ms / 1000);
+                const m = Math.floor(sec / 60);
+                const s = sec % 60;
+                return m + ':' + (s < 10 ? '0' : '') + s;
+            }
+
+            function updateTimeDisplay() {
+                if (gameOver) return;
+                gameTimeEl.textContent = formatTime(Date.now() - gameStartTime);
+            }
+
+            function updateBuffDisplay() {
+                const now = Date.now();
+                let html = '';
+                for (const type in activeBuffs) {
+                    const remaining = Math.ceil((activeBuffs[type] - now) / 1000);
+                    if (remaining > 0) {
+                        const name = BUFF_NAMES[type] || type;
+                        const color = BUFF_COLORS[type] || '#9bbc0f';
+                        html += '<div class="buff-timer"><span class="buff-timer-icon" style="background:' + color + '"></span><span>' + name + ': ' + remaining + 's</span></div>';
+                    }
+                }
+                buffsDisplayEl.innerHTML = html;
+            }
+
+            function updateLegendDisplay() {
+                document.getElementById('legendObstacle').style.display = level >= 3 ? 'flex' : 'none';
+                document.getElementById('legendDangerous').style.display = level >= 5 ? 'flex' : 'none';
+            }
+
             function isBlocked(x, y) {
                 return obstacles.some(obs => obs.x === x && obs.y === y);
             }
 
+            function isOnDangerousObstacle(x, y) {
+                return dangerousObstacles.some(obs => obs.x === x && obs.y === y);
+            }
+
             function spawnObstacles() {
                 obstacles = [];
-                if (level < 3) return;
-                const count = level - 2;
+                dangerousObstacles = [];
                 const blocked = new Set();
                 snake.forEach(seg => blocked.add(seg.x + ',' + seg.y));
                 blocked.add(food.x + ',' + food.y);
-                for (let i = 0; i < count; i++) {
-                    let pos = null;
-                    let attempts = 0;
-                    while (attempts < 100) {
-                        const x = Math.floor(Math.random() * gridSize);
-                        const y = Math.floor(Math.random() * gridSize);
-                        const key = x + ',' + y;
-                        if (!blocked.has(key)) {
-                            pos = { x, y };
-                            blocked.add(key);
-                            break;
+                if (buffItem) blocked.add(buffItem.x + ',' + buffItem.y);
+                if (level >= 3) {
+                    const count = level - 2;
+                    for (let i = 0; i < count; i++) {
+                        let pos = null;
+                        let attempts = 0;
+                        while (attempts < 100) {
+                            const x = Math.floor(Math.random() * currentGridSize);
+                            const y = Math.floor(Math.random() * currentGridSize);
+                            const key = x + ',' + y;
+                            if (!blocked.has(key)) {
+                                pos = { x, y };
+                                blocked.add(key);
+                                break;
+                            }
+                            attempts++;
                         }
-                        attempts++;
+                        if (pos) obstacles.push(pos);
                     }
-                    if (pos) obstacles.push(pos);
+                }
+                if (level >= 5) {
+                    const dangerousCount = Math.max(1, level - 4);
+                    for (let i = 0; i < dangerousCount; i++) {
+                        let pos = null;
+                        let attempts = 0;
+                        while (attempts < 100) {
+                            const x = Math.floor(Math.random() * currentGridSize);
+                            const y = Math.floor(Math.random() * currentGridSize);
+                            const key = x + ',' + y;
+                            if (!blocked.has(key)) {
+                                pos = { x, y };
+                                blocked.add(key);
+                                break;
+                            }
+                            attempts++;
+                        }
+                        if (pos) dangerousObstacles.push(pos);
+                    }
                 }
             }
 
             function spawnFood() {
                 let validPosition = false;
-                let newFood = { x: 0, y: 0 };
+                let newFood = { x: 0, y: 0, type: 'normal' };
 
                 while (!validPosition) {
-                    newFood.x = Math.floor(Math.random() * gridSize);
-                    newFood.y = Math.floor(Math.random() * gridSize);
-                    validPosition = !snake.some(seg => seg.x === newFood.x && seg.y === newFood.y) && !isBlocked(newFood.x, newFood.y);
+                    newFood.x = Math.floor(Math.random() * currentGridSize);
+                    newFood.y = Math.floor(Math.random() * currentGridSize);
+                    validPosition = !snake.some(function(seg) { return seg.x === newFood.x && seg.y === newFood.y; }) && !isBlocked(newFood.x, newFood.y) && !isOnDangerousObstacle(newFood.x, newFood.y) && !isBuffPosition(newFood.x, newFood.y);
                 }
 
+                var r = Math.random();
+                if (level >= 2 && r < 0.15) {
+                    newFood.type = 'golden';
+                } else if (level >= 4 && r >= 0.15 && r < 0.25) {
+                    newFood.type = 'poison';
+                } else if (comboCount >= 2 && r >= 0.25 && r < 0.55) {
+                    newFood.type = 'combo';
+                } else {
+                    newFood.type = 'normal';
+                }
                 food = newFood;
             }
 
+            function spawnParticles(x, y, color) {
+                const cs = getCellSize();
+                const cx = x * cs + cs / 2;
+                const cy = y * cs + cs / 2;
+                var count = Math.min(12, MAX_PARTICLES - particles.length);
+                for (var i = 0; i < count; i++) {
+                    var angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+                    var speed = 2 + Math.random() * 4;
+                    particles.push({
+                        x: cx,
+                        y: cy,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 0.4 + Math.random() * 0.3,
+                        color: color || '#0f380f'
+                    });
+                }
+            }
+
+            function updateParticles() {
+                var dt = gameSpeed / 1000;
+                for (var i = particles.length - 1; i >= 0; i--) {
+                    var p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= dt;
+                    if (p.life <= 0) particles.splice(i, 1);
+                }
+            }
+
+            function drawParticles() {
+                const cs = getCellSize();
+                particles.forEach(function(p) {
+                    ctx.globalAlpha = p.life / 0.5;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+                });
+                ctx.globalAlpha = 1;
+            }
+
             function drawSnake() {
-                snake.forEach((seg, i) => {
+                const cs = getCellSize();
+                const breathScale = 1 + 0.03 * Math.sin(Date.now() / 150);
+                snake.forEach(function(seg, i) {
+                    ctx.save();
+                    const cx = seg.x * cs + cs / 2;
+                    const cy = seg.y * cs + cs / 2;
+                    ctx.translate(cx, cy);
+                    ctx.scale(breathScale, breathScale);
+                    ctx.translate(-cx, -cy);
                     ctx.fillStyle = i === 0 ? '#0f380f' : '#306230';
                     ctx.strokeStyle = '#0f380f';
                     ctx.lineWidth = 1;
-                    ctx.fillRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
-                    ctx.strokeRect(seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2);
+                    ctx.fillRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
+                    ctx.strokeRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
+                    ctx.restore();
                 });
             }
 
             function drawObstacles() {
-                obstacles.forEach(obs => {
-                    const cx = obs.x * cellSize + cellSize / 2;
-                    const cy = obs.y * cellSize + cellSize / 2;
-                    const s = cellSize / 2 - 2;
-                    ctx.fillStyle = '#5c4033';
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy - s);
-                    ctx.lineTo(cx + s, cy);
-                    ctx.lineTo(cx, cy + s);
-                    ctx.lineTo(cx - s, cy);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.strokeStyle = '#3d2e22';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
+                const cs = getCellSize();
+                const padding = 2;
+                const size = cs - padding * 2;
+                obstacles.forEach(function(obs) {
+                    drawSprite('rock', obs.x * cs + padding, obs.y * cs + padding, size);
+                });
+            }
+
+            function drawDangerousObstacles() {
+                const cs = getCellSize();
+                const padding = 2;
+                const size = cs - padding * 2;
+                dangerousObstacles.forEach(function(obs) {
+                    drawSprite('danger', obs.x * cs + padding, obs.y * cs + padding, size);
                 });
             }
 
             function drawFood() {
-                ctx.fillStyle = '#0f380f';
-                ctx.strokeStyle = '#0f380f';
-                ctx.lineWidth = 1;
-                const padding = 4;
-                ctx.fillRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
-                ctx.strokeRect(food.x * cellSize + padding, food.y * cellSize + padding, cellSize - padding * 2, cellSize - padding * 2);
+                const cs = getCellSize();
+                const padding = 2;
+                const size = cs - padding * 2;
+                var t = food.type || 'normal';
+                var key = t === 'normal' ? 'apple' : (t === 'golden' ? 'apple_golden' : (t === 'poison' ? 'poison' : 'combo'));
+                drawSprite(key, food.x * cs + padding, food.y * cs + padding, size);
+            }
+
+            var BUFF_TO_SPRITE = { slowMotion: 'slow', doublePoints: 'double', protection: 'protection', shield: 'shield', shrink: 'shrink', magnet: 'magnet' };
+
+            function drawBuff() {
+                if (!buffItem) return;
+                const cs = getCellSize();
+                const padding = 2;
+                const size = cs - padding * 2;
+                var key = BUFF_TO_SPRITE[buffItem.type] || 'shield';
+                drawSprite(key, buffItem.x * cs + padding, buffItem.y * cs + padding, size);
             }
 
             function draw() {
@@ -490,7 +1248,11 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 drawObstacles();
+                drawDangerousObstacles();
                 drawFood();
+                drawBuff();
+                updateParticles();
+                drawParticles();
                 drawSnake();
             }
 
@@ -498,55 +1260,159 @@
                 direction = nextDirection;
                 const head = snake[0];
                 const delta = directions[direction];
-                const newHead = {
+                let newHead = {
                     x: head.x + delta.x,
                     y: head.y + delta.y
                 };
+                const hasProtection = activeBuffs.protection || protectionGraceTick;
+                const outOfBounds = newHead.x < 0 || newHead.x >= currentGridSize || newHead.y < 0 || newHead.y >= currentGridSize;
+                if ((hasProtection || shieldActive) && outOfBounds) {
+                    if (shieldActive && !hasProtection) {
+                        shieldActive = false;
+                        if (shieldIcon) shieldIcon.style.display = 'none';
+                    }
+                    newHead.x = ((newHead.x % currentGridSize) + currentGridSize) % currentGridSize;
+                    newHead.y = ((newHead.y % currentGridSize) + currentGridSize) % currentGridSize;
+                }
 
                 if (newHead.x === food.x && newHead.y === food.y) {
-                    snake.unshift(newHead);
-                    score += POINTS_PER_FOOD;
+                    const foodType = food.type || 'normal';
+                    var points = 0;
+                    var atePoison = false;
+                    if (foodType === 'poison') {
+                        atePoison = true;
+                        comboCount = 0;
+                        snake.unshift(newHead);
+                        snake.pop();
+                        if (snake.length > 3) snake.pop();
+                        score = Math.max(0, score - POINTS_POISON_PENALTY);
+                        spawnParticles(food.x, food.y, '#8b0000');
+                        AudioSystem.eatPoison();
+                    } else {
+                        snake.unshift(newHead);
+                        var basePoints = foodType === 'golden' ? POINTS_GOLDEN : (foodType === 'combo' ? POINTS_PER_FOOD : POINTS_PER_FOOD);
+                        var now = Date.now();
+                        if (now - lastEatTime < COMBO_WINDOW && foodType !== 'poison') {
+                            comboCount++;
+                        } else {
+                            comboCount = 1;
+                        }
+                        lastEatTime = now;
+                        var comboBonus = (comboCount > 1 ? (comboCount - 1) * COMBO_BONUS : 0);
+                        points = (basePoints + comboBonus) * (activeBuffs.doublePoints ? 2 : 1);
+                        score += points;
+                        if (foodType === 'golden') {
+                            AudioSystem.eatGolden();
+                            spawnParticles(food.x, food.y, '#ffd700');
+                        } else if (foodType === 'combo') {
+                            AudioSystem.eatCombo(comboCount);
+                            spawnParticles(food.x, food.y, '#9370db');
+                        } else {
+                            AudioSystem.eat();
+                            spawnParticles(food.x, food.y, '#0f380f');
+                        }
+                    }
                     scoreEl.textContent = score;
-                    AudioSystem.eat();
 
-                    const newLevel = Math.min(100, Math.floor(score / POINTS_PER_LEVEL) + 1);
-                    if (newLevel > level) {
-                        level = newLevel;
-                        spawnObstacles();
-                        showLevelUp();
+                    if (!atePoison) {
+                        const newLevel = Math.min(100, Math.floor(score / POINTS_PER_LEVEL) + 1);
+                        if (newLevel > level) {
+                            level = newLevel;
+                            spawnObstacles();
+                            spawnBuff();
+                            showLevelUp();
+                        }
                     }
 
                     spawnFood();
-                } else if (isBlocked(newHead.x, newHead.y)) {
-                } else {
+                    spawnBuff();
+                } else if (buffItem && newHead.x === buffItem.x && newHead.y === buffItem.y) {
                     snake.unshift(newHead);
                     snake.pop();
+                    applyBuff(buffItem.type);
+                } else if (isOnDangerousObstacle(newHead.x, newHead.y) && !hasProtection) {
+                    if (shieldActive) {
+                        shieldActive = false;
+                        if (shieldIcon) shieldIcon.style.display = 'none';
+                    } else {
+                        snake.unshift(newHead);
+                        snake.pop();
+                        endGame();
+                        return;
+                    }
+                } else if (isBlocked(newHead.x, newHead.y) && !hasProtection) {
+                } else {
+                    const hitsBody = snake.some(function(seg, i) { return i > 0 && seg.x === newHead.x && seg.y === newHead.y; });
+                    if (hitsBody && shieldActive) {
+                        shieldActive = false;
+                        if (shieldIcon) shieldIcon.style.display = 'none';
+                    } else {
+                        snake.unshift(newHead);
+                        snake.pop();
+                    }
                 }
             }
 
             function checkCollision() {
                 const head = snake[0];
+                const hasProtection = activeBuffs.protection || protectionGraceTick;
 
-                if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
-                    return true;
-                }
-
-                for (let i = 1; i < snake.length; i++) {
-                    if (head.x === snake[i].x && head.y === snake[i].y) {
-                        return true;
+                if (hasProtection) return false;
+                if (shieldActive) {
+                    if (head.x < 0 || head.x >= currentGridSize || head.y < 0 || head.y >= currentGridSize) {
+                        shieldActive = false;
+                        if (shieldIcon) shieldIcon.style.display = 'none';
+                        return false;
+                    }
+                    if (isOnDangerousObstacle(head.x, head.y)) {
+                        shieldActive = false;
+                        if (shieldIcon) shieldIcon.style.display = 'none';
+                        return false;
+                    }
+                    for (let i = 1; i < snake.length; i++) {
+                        if (head.x === snake[i].x && head.y === snake[i].y) {
+                            shieldActive = false;
+                            if (shieldIcon) shieldIcon.style.display = 'none';
+                            return false;
+                        }
                     }
                 }
-
+                if (head.x < 0 || head.x >= currentGridSize || head.y < 0 || head.y >= currentGridSize) return true;
+                if (isOnDangerousObstacle(head.x, head.y)) return true;
+                for (let i = 1; i < snake.length; i++) {
+                    if (head.x === snake[i].x && head.y === snake[i].y) return true;
+                }
                 return false;
             }
 
+            function runScreenShake() {
+                shakeFrames = 15;
+                shakeIntensity = 4;
+                function shakeLoop() {
+                    if (shakeFrames > 0 && canvasWrapper) {
+                        var ox = (Math.random() - 0.5) * 2 * shakeIntensity;
+                        var oy = (Math.random() - 0.5) * 2 * shakeIntensity;
+                        canvasWrapper.style.transform = 'translate(' + ox + 'px, ' + oy + 'px)';
+                        shakeFrames--;
+                        requestAnimationFrame(shakeLoop);
+                    } else if (canvasWrapper) {
+                        canvasWrapper.style.transform = 'translate(0, 0)';
+                    }
+                }
+                requestAnimationFrame(shakeLoop);
+            }
+
             function endGame() {
-                AudioSystem.gameOver();
+                if (gameOver) return;
                 gameOver = true;
+                AudioSystem.bgMusicStop();
+                AudioSystem.gameOver();
+                runScreenShake();
                 clearInterval(gameLoopId);
                 gameLoopId = null;
                 finalScoreEl.textContent = score;
                 finalLevelEl.textContent = level;
+                finalTimeEl.textContent = formatTime(Date.now() - gameStartTime);
                 if (RecordeSystem.isRecorde(score)) {
                     const name = prompt('Novo recorde! Digite seu nome:', '') || 'Anônimo';
                     RecordeSystem.set(score, name);
@@ -557,11 +1423,14 @@
             }
 
             function tick() {
-                if (gameOver || levelUpPaused) return;
+                if (gameOver || levelUpPaused || gamePaused) return;
 
-                if (directionQueue.length > 0) {
-                    nextDirection = directionQueue.shift();
-                }
+                nextDirection = getNextDirectionFromInput();
+
+                updateBuffs();
+                if (gameOver) return;
+
+                moveFoodTowardSnake();
                 moveSnake();
 
                 if (checkCollision()) {
@@ -569,45 +1438,83 @@
                     return;
                 }
 
+                updateTimeDisplay();
+                updateBuffDisplay();
                 draw();
             }
 
             function startGame() {
                 initGame();
                 AudioSystem.start();
+                AudioSystem.bgMusicPlay();
                 draw();
                 gameLoopId = setInterval(tick, gameSpeed);
             }
 
             document.addEventListener('keydown', function(e) {
-                if (gameOver) return;
-                if (e.repeat) return;
-
                 const key = e.key.toLowerCase();
-                let newDir = null;
-
-                if (key === 'w') newDir = 'up';
-                else if (key === 's') newDir = 'down';
-                else if (key === 'a') newDir = 'left';
-                else if (key === 'd') newDir = 'right';
-
-                if (newDir) {
-                    const currentDir = directionQueue.length > 0 ? directionQueue[directionQueue.length - 1] : direction;
-                    if (newDir !== opposite[currentDir] && directionQueue[directionQueue.length - 1] !== newDir) {
-                        if (directionQueue.length >= MAX_DIRECTION_QUEUE) {
-                            directionQueue.shift();
+                if (key === 'escape') {
+                    e.preventDefault();
+                    if (gameOver || levelUpPaused) return;
+                    gamePaused = !gamePaused;
+                    if (gamePaused) {
+                        if (gameLoopId) {
+                            clearInterval(gameLoopId);
+                            gameLoopId = null;
                         }
-                        directionQueue.push(newDir);
-                        e.preventDefault();
+                        pauseOverlay.style.display = 'flex';
+                    } else {
+                        pauseOverlay.style.display = 'none';
+                        gameLoopId = setInterval(tick, gameSpeed);
                     }
+                    return;
                 }
+                if (gamePaused) return;
+                const dir = keyToDir[key];
+                if (dir) {
+                    pressedKeys.set(key, Date.now());
+                    if (!e.repeat) {
+                        enqueueDirection(dir);
+                    }
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('keyup', function(e) {
+                const key = e.key.toLowerCase();
+                if (keyToDir[key]) {
+                    pressedKeys.delete(key);
+                }
+            });
+
+            function clearPressedKeys() {
+                pressedKeys.clear();
+                directionQueue.length = 0;
+            }
+
+            window.addEventListener('blur', clearPressedKeys);
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) clearPressedKeys();
             });
 
             restartBtn.addEventListener('click', startGame);
             restartBtnOverlay.addEventListener('click', startGame);
 
+            window.addEventListener('resize', function() {
+                resizeCanvas();
+                draw();
+            });
+
             updateRecordeDisplay();
-            startGame();
+            initLegendSprites();
+            loadSprites(function() {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                startGame();
+                requestAnimationFrame(function() {
+                    resizeCanvas();
+                    draw();
+                });
+            });
         })();
     </script>
 </body>
