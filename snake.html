@@ -147,6 +147,22 @@
             font-size: 0.6rem;
         }
 
+        #pauseOverlay button {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: clamp(8px, 1vw, 12px) clamp(16px, 2vw, 24px);
+            font-size: clamp(0.4rem, 0.9vw, 0.5rem);
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        #pauseOverlay button:hover {
+            background: #306230;
+        }
+
         #shieldIcon {
             position: absolute;
             top: 8px;
@@ -233,6 +249,51 @@
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #306230;
+        }
+
+        .music-player {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .music-player-label {
+            color: #9bbc0f;
+            font-size: clamp(0.4rem, 0.9vw, 0.5rem);
+        }
+
+        .music-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .music-player-controls button {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            font-size: 0.6rem;
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .music-player-controls button:hover {
+            background: #306230;
+        }
+
+        .music-track-name {
+            color: #9bbc0f;
+            font-size: clamp(0.35rem, 0.85vw, 0.45rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
         }
 
         .canvas-wrapper {
@@ -401,6 +462,110 @@
             image-rendering: crisp-edges;
         }
 
+        .mode-select-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 25;
+            background: rgba(15, 56, 15, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #9bbc0f;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: 20px;
+        }
+
+        .mode-select-overlay h2 {
+            font-size: clamp(0.7rem, 2vw, 1rem);
+            margin-bottom: 24px;
+            color: #9bbc0f;
+        }
+
+        .mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: clamp(0.45rem, 1.2vw, 0.6rem);
+        }
+
+        .mode-options label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 2px solid #306230;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .mode-options label:hover {
+            background: rgba(48, 98, 48, 0.3);
+        }
+
+        .mode-options input[type="radio"] {
+            accent-color: #9bbc0f;
+        }
+
+        .mode-options input[type="radio"]:checked + span {
+            color: #9bbc0f;
+        }
+
+        #survivalTimeOptions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-left: 28px;
+            margin-top: 8px;
+        }
+
+        #survivalTimeOptions span {
+            font-size: clamp(0.4rem, 1vw, 0.5rem);
+        }
+
+        #survivalTimeOptions button {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: 6px 12px;
+            font-size: clamp(0.35rem, 0.9vw, 0.45rem);
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #survivalTimeOptions button:hover,
+        #survivalTimeOptions button.selected {
+            background: #306230;
+        }
+
+        .mode-desc {
+            font-size: clamp(0.35rem, 0.9vw, 0.45rem);
+            margin-bottom: 20px;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.6;
+            color: #8bac0f;
+        }
+
+        #startGameBtn {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            padding: clamp(10px, 1.5vw, 14px) clamp(24px, 3vw, 32px);
+            font-size: clamp(0.5rem, 1.2vw, 0.65rem);
+            color: #9bbc0f;
+            background: #0f380f;
+            border: 2px solid #306230;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #startGameBtn:hover {
+            background: #306230;
+        }
+
         @media (max-width: 600px) {
             .game-layout {
                 flex-direction: column;
@@ -436,6 +601,24 @@
         <div class="header">
             <h1>Jogo da Cobrinha</h1>
         </div>
+        <div id="modeSelectOverlay" class="mode-select-overlay" style="display: none;">
+            <h2>Escolha o modo</h2>
+            <div class="mode-options">
+                <label><input type="radio" name="mode" value="classic" checked><span>Clássico</span></label>
+                <label><input type="radio" name="mode" value="survival"><span>Sobrevivência</span></label>
+                <div id="survivalTimeOptions" style="display:none;">
+                    <span>Tempo:</span>
+                    <button type="button" data-min="1">1 min</button>
+                    <button type="button" data-min="2">2 min</button>
+                    <button type="button" data-min="3" class="selected">3 min</button>
+                    <button type="button" data-min="5">5 min</button>
+                </div>
+                <label><input type="radio" name="mode" value="hardcore"><span>Hardcore</span></label>
+                <label><input type="radio" name="mode" value="zen"><span>Zen</span></label>
+            </div>
+            <p id="modeDescription" class="mode-desc">Modo padrão com obstáculos, buffs e veneno.</p>
+            <button id="startGameBtn" type="button">Iniciar</button>
+        </div>
         <div class="game-layout">
             <div class="canvas-wrapper">
                 <canvas id="gameCanvas" width="400" height="400"></canvas>
@@ -445,14 +628,18 @@
                 </div>
                 <div id="pauseOverlay" style="display: none;">
                     <h2>Pausado</h2>
-                    <p>ESC para continuar</p>
+                    <p>ESC para voltar ao menu</p>
+                    <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; justify-content: center;">
+                        <button id="resumeBtn" type="button">Continuar</button>
+                        <button id="backToMenuBtn" type="button">Voltar ao menu</button>
+                    </div>
                 </div>
                 <div id="shieldIcon" style="display: none;" title="Shield ativo"></div>
                 <div id="loadingOverlay" style="display: flex; position: absolute; inset: 0; z-index: 20; background: rgba(15, 56, 15, 0.95); flex-direction: column; justify-content: center; align-items: center; color: #9bbc0f; border-radius: 8px;">
                     <p style="font-size: 0.6rem; margin-bottom: 12px;">Carregando...</p>
                 </div>
                 <div id="gameOverOverlay" style="display: none;">
-                    <h2>Game Over!</h2>
+                    <h2 id="gameOverTitle">Game Over!</h2>
                     <p>Pontuação final: <span id="finalScore">0</span></p>
                     <p>Nível alcançado: <span id="finalLevel">1</span></p>
                     <p>Tempo: <span id="finalTime">0:00</span></p>
@@ -462,26 +649,34 @@
             <div class="info-panel">
                 <div class="score-display">Placar: <span id="score">0</span></div>
                 <div class="level-display">Nível: <span id="level">1</span></div>
-                <div class="time-display">Tempo: <span id="gameTime">0:00</span></div>
+                <div class="time-display"><span id="timeLabel">Tempo:</span> <span id="gameTime">0:00</span></div>
                 <div class="record-display">Recorde: <span id="recordScore">--</span> <span id="recordName"></span></div>
                 <div class="speed-display">Velocidade: <span id="speed">1.0</span>x</div>
                 <div class="volume-control">
                     <label for="volumeSlider">Volume: <span id="volumeValue">20</span>%</label>
                     <input type="range" id="volumeSlider" min="0" max="100" value="20">
                 </div>
+                <div class="music-player">
+                    <label class="music-player-label">Música</label>
+                    <div class="music-player-controls">
+                        <button id="bgMusicPrevBtn" type="button" title="Música anterior">&#9664;</button>
+                        <span id="bgMusicTrackName" class="music-track-name">--</span>
+                        <button id="bgMusicNextBtn" type="button" title="Próxima música">&#9654;</button>
+                    </div>
+                </div>
                 <div id="buffsDisplay" class="buffs-display"></div>
                 <div class="legend">
                     <div class="legend-title">Legenda</div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="apple" alt="Comida"><span>Comida</span></div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="apple_golden" alt="Maçã dourada"><span>Maçã dourada</span></div>
-                    <div class="legend-item"><img class="legend-sprite" data-sprite="poison" alt="Venenosa"><span>Venenosa</span></div>
-                    <div class="legend-item"><img class="legend-sprite" data-sprite="combo" alt="Combo"><span>Combo</span></div>
+                    <div class="legend-item" id="legendPoison"><img class="legend-sprite" data-sprite="poison" alt="Venenosa"><span>Venenosa</span></div>
+                    <div class="legend-item" id="legendCombo"><img class="legend-sprite" data-sprite="combo" alt="Combo"><span>Combo</span></div>
                     <div class="legend-item" id="legendObstacle" style="display:none"><img class="legend-sprite" data-sprite="rock" alt="Obstáculo"><span>Obstáculo</span></div>
                     <div class="legend-item" id="legendDangerous" style="display:none"><img class="legend-sprite" data-sprite="danger" alt="Perigoso"><span>Obstáculo perigoso</span></div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="slow" alt="Slow"><span>Slow Motion</span></div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="double" alt="2x"><span>Double Points</span></div>
-                    <div class="legend-item"><img class="legend-sprite" data-sprite="protection" alt="Prot"><span>Protection</span></div>
-                    <div class="legend-item"><img class="legend-sprite" data-sprite="shield" alt="Shield"><span>Shield</span></div>
+                    <div class="legend-item" id="legendProtection"><img class="legend-sprite" data-sprite="protection" alt="Prot"><span>Protection</span></div>
+                    <div class="legend-item" id="legendShield"><img class="legend-sprite" data-sprite="shield" alt="Shield"><span>Shield</span></div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="shrink" alt="Shrink"><span>Shrink</span></div>
                     <div class="legend-item"><img class="legend-sprite" data-sprite="magnet" alt="Magnet"><span>Magnet</span></div>
                 </div>
@@ -556,7 +751,11 @@
 
             const AudioSystem = (function() {
                 let audioCtx = null;
-                const bgMusicTracks = ['03_Elia.mp3', '04_Atum.mp3', 'Theme_RuleCastle.mp3'];
+                const bgMusicTracks = [
+                    '03_Elia.mp3', 'Track1.mp3', 'Track5.mp3', 'Track7.mp3',
+                    'TrackC.mp3', 'TrackF.mp3', 'TrackG.mp3', 'TrackI.mp3',
+                    'TrackL.mp3', 'TrackQ.mp3', 'TrackS.mp3', 'TrackU.mp3'
+                ];
                 let bgAudio = null;
                 let bgIndex = 0;
 
@@ -577,7 +776,19 @@
                     bgIndex = (bgIndex + 1) % bgMusicTracks.length;
                     bgAudio.src = bgMusicTracks[bgIndex];
                     bgAudio.play().catch(function() {});
+                    if (onTrackChange) onTrackChange();
                 }
+
+                function playPrevBgTrack() {
+                    if (!bgAudio) return;
+                    bgIndex = (bgIndex - 1 + bgMusicTracks.length) % bgMusicTracks.length;
+                    bgAudio.src = bgMusicTracks[bgIndex];
+                    bgAudio.currentTime = 0;
+                    bgAudio.play().catch(function() {});
+                    if (onTrackChange) onTrackChange();
+                }
+
+                var onTrackChange = null;
 
                 function playTone(freq, duration, type) {
                     try {
@@ -650,6 +861,7 @@
                                 bgAudio.volume = (parseInt(localStorage.getItem('snakeBgVolume') || '20', 10) / 100);
                                 bgAudio.currentTime = 0;
                                 bgAudio.play().catch(function() {});
+                                if (onTrackChange) onTrackChange();
                                 return;
                             }
                             bgAudio = new Audio(bgMusicTracks[0]);
@@ -657,6 +869,7 @@
                             bgAudio.loop = false;
                             bgAudio.addEventListener('ended', playNextBgTrack);
                             bgAudio.play().catch(function() {});
+                            if (onTrackChange) onTrackChange();
                         } catch (e) {}
                     },
                     bgMusicStop: function() {
@@ -671,7 +884,21 @@
                         if (vol < 0) vol = 0;
                         if (vol > 1) vol = 1;
                         if (bgAudio) bgAudio.volume = vol;
-                    }
+                    },
+                    bgMusicNext: function() {
+                        if (!bgAudio) return;
+                        playNextBgTrack();
+                    },
+                    bgMusicPrev: function() {
+                        if (!bgAudio) return;
+                        playPrevBgTrack();
+                    },
+                    getBgTrackIndex: function() { return bgIndex; },
+                    getBgTrackName: function() {
+                        var name = bgMusicTracks[bgIndex] || '';
+                        return name.replace(/\.mp3$/i, '');
+                    },
+                    setOnTrackChange: function(cb) { onTrackChange = cb; }
                 };
             })();
 
@@ -715,6 +942,28 @@
                 });
             }
 
+            function updateBgMusicDisplay() {
+                var el = document.getElementById('bgMusicTrackName');
+                if (el) el.textContent = AudioSystem.getBgTrackName() || '--';
+            }
+
+            AudioSystem.setOnTrackChange(updateBgMusicDisplay);
+
+            var bgMusicPrevBtn = document.getElementById('bgMusicPrevBtn');
+            var bgMusicNextBtn = document.getElementById('bgMusicNextBtn');
+            if (bgMusicPrevBtn) {
+                bgMusicPrevBtn.addEventListener('click', function() {
+                    AudioSystem.bgMusicPlay();
+                    AudioSystem.bgMusicPrev();
+                });
+            }
+            if (bgMusicNextBtn) {
+                bgMusicNextBtn.addEventListener('click', function() {
+                    AudioSystem.bgMusicPlay();
+                    AudioSystem.bgMusicNext();
+                });
+            }
+
             const baseGridSize = 20;
             let cellPx = 20;
             let currentGridSize = 20;
@@ -735,22 +984,32 @@
             const BUFF_NAMES = { slowMotion: 'Slow', doublePoints: '2x', protection: 'Prot', shield: 'Shield', shrink: 'Shrink', magnet: 'Magnet' };
             const BUFF_SPAWN_CHANCE = 0.6;
 
-            const RecordeSystem = (function() {
-                const KEY = 'snakeRecorde';
+            const GAME_MODES = { classic: 'classic', survival: 'survival', hardcore: 'hardcore', zen: 'zen' };
+            let currentGameMode = GAME_MODES.classic;
+            let survivalTimeLimit = 180;
 
-                function get() {
+            const RecordeSystem = (function() {
+                function key(mode) {
+                    return 'snakeRecorde_' + (mode || currentGameMode);
+                }
+
+                function get(mode) {
                     try {
-                        const data = localStorage.getItem(KEY);
+                        var k = key(mode);
+                        var data = localStorage.getItem(k);
+                        if (!data && (mode || currentGameMode) === 'classic') {
+                            data = localStorage.getItem('snakeRecorde');
+                        }
                         return data ? JSON.parse(data) : null;
                     } catch (e) { return null; }
                 }
 
-                function set(score, name) {
-                    localStorage.setItem(KEY, JSON.stringify({ score, name: name || 'Anônimo' }));
+                function set(score, name, mode) {
+                    localStorage.setItem(key(mode), JSON.stringify({ score, name: name || 'Anônimo' }));
                 }
 
-                function isRecorde(score) {
-                    const r = get();
+                function isRecorde(score, mode) {
+                    const r = get(mode);
                     return !r || score > r.score;
                 }
 
@@ -758,6 +1017,8 @@
             })();
 
             let snake = [];
+            let snakePrev = [];
+            let lastTickTime = 0;
             let food = { x: 0, y: 0 };
             let direction = 'right';
             let nextDirection = 'right';
@@ -767,6 +1028,7 @@
             let gameOver = false;
             let levelUpPaused = false;
             let gameLoopId = null;
+            let renderLoopId = null;
             let obstacles = [];
             let dangerousObstacles = [];
             let buffItem = null;
@@ -846,6 +1108,35 @@
                 return cellPx;
             }
 
+            function getSegmentDir(i) {
+                if (snake.length <= 1) return { in: direction, out: direction };
+                if (i === 0) {
+                    return { in: opposite[direction], out: direction };
+                }
+                if (i === snake.length - 1) {
+                    var prev = snake[i - 1];
+                    var curr = snake[i];
+                    var dx = curr.x - prev.x;
+                    var dy = curr.y - prev.y;
+                    var d = (dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up');
+                    return { in: d, out: d };
+                }
+                var p = snake[i - 1];
+                var c = snake[i];
+                var n = snake[i + 1];
+                var inDx = c.x - n.x;
+                var inDy = c.y - n.y;
+                var outDx = p.x - c.x;
+                var outDy = p.y - c.y;
+                var inDir = (inDx > 0 ? 'right' : inDx < 0 ? 'left' : inDy > 0 ? 'down' : 'up');
+                var outDir = (outDx > 0 ? 'right' : outDx < 0 ? 'left' : outDy > 0 ? 'down' : 'up');
+                return { in: inDir, out: outDir };
+            }
+
+            function dirToAngle(dir) {
+                return { up: -Math.PI / 2, down: Math.PI / 2, left: Math.PI, right: 0 }[dir];
+            }
+
             function getSpeedForLevel(lvl) {
                 const multiplier = 1 + (lvl - 1) * SPEED_INCREASE_PER_LEVEL;
                 return Math.max(MIN_SPEED, Math.floor(INITIAL_SPEED / multiplier));
@@ -876,7 +1167,9 @@
                 }, 1500);
             }
 
-            function initGame() {
+            function initGame(mode, survivalSeconds) {
+                if (mode !== undefined) currentGameMode = mode;
+                if (survivalSeconds !== undefined) survivalTimeLimit = survivalSeconds;
                 currentGridSize = baseGridSize;
                 resizeCanvas();
                 pressedKeys.clear();
@@ -892,6 +1185,8 @@
                     { x: centerX - 1, y: centerY },
                     { x: centerX - 2, y: centerY }
                 ];
+                snakePrev = snake.map(function(s) { return { x: s.x, y: s.y }; });
+                lastTickTime = Date.now();
                 direction = 'right';
                 nextDirection = 'right';
                 score = 0;
@@ -913,6 +1208,8 @@
                 scoreEl.textContent = score;
                 levelEl.textContent = level;
                 gameOverOverlay.style.display = 'none';
+                var goTitle = document.getElementById('gameOverTitle');
+                if (goTitle) goTitle.textContent = 'Game Over!';
                 document.getElementById('levelUpOverlay').style.display = 'none';
                 pauseOverlay.style.display = 'none';
                 shieldIcon.style.display = 'none';
@@ -920,6 +1217,8 @@
                 updateRecordeDisplay();
                 updateSpeedDisplay();
                 updateLegendDisplay();
+                var timeLabelEl = document.getElementById('timeLabel');
+                if (timeLabelEl) timeLabelEl.textContent = currentGameMode === GAME_MODES.survival ? 'Restante:' : 'Tempo:';
                 updateTimeDisplay();
                 updateBuffDisplay();
                 spawnBuff();
@@ -941,8 +1240,13 @@
                     const x = Math.floor(Math.random() * currentGridSize);
                     const y = Math.floor(Math.random() * currentGridSize);
                     if (!blocked.has(x + ',' + y)) {
-                        const availableTypes = level >= 1 ? BUFF_TYPES : BUFF_TYPES.filter(t => t !== 'protection');
-                        buffItem = { x, y, type: availableTypes[Math.floor(Math.random() * availableTypes.length)] };
+                        var availableTypes = level >= 1 ? BUFF_TYPES : BUFF_TYPES.filter(t => t !== 'protection');
+                        if (currentGameMode === GAME_MODES.hardcore) {
+                            availableTypes = availableTypes.filter(t => t !== 'protection' && t !== 'shield');
+                        }
+                        if (availableTypes.length > 0) {
+                            buffItem = { x, y, type: availableTypes[Math.floor(Math.random() * availableTypes.length)] };
+                        }
                         return;
                     }
                     attempts++;
@@ -1028,7 +1332,7 @@
             }
 
             function updateRecordeDisplay() {
-                const r = RecordeSystem.get();
+                const r = RecordeSystem.get(currentGameMode);
                 document.getElementById('recordScore').textContent = r ? r.score : '--';
                 document.getElementById('recordName').textContent = r ? `(${r.name})` : '';
             }
@@ -1046,7 +1350,13 @@
 
             function updateTimeDisplay() {
                 if (gameOver) return;
-                gameTimeEl.textContent = formatTime(Date.now() - gameStartTime);
+                if (currentGameMode === GAME_MODES.survival) {
+                    var elapsed = Date.now() - gameStartTime;
+                    var remaining = Math.max(0, survivalTimeLimit * 1000 - elapsed);
+                    gameTimeEl.textContent = formatTime(remaining);
+                } else {
+                    gameTimeEl.textContent = formatTime(Date.now() - gameStartTime);
+                }
             }
 
             function updateBuffDisplay() {
@@ -1064,8 +1374,20 @@
             }
 
             function updateLegendDisplay() {
-                document.getElementById('legendObstacle').style.display = level >= 3 ? 'flex' : 'none';
-                document.getElementById('legendDangerous').style.display = level >= 5 ? 'flex' : 'none';
+                var showObstacles = currentGameMode !== GAME_MODES.zen && level >= 3;
+                var showDangerous = currentGameMode !== GAME_MODES.zen && level >= 5;
+                var showPoisonCombo = currentGameMode !== GAME_MODES.zen;
+                var showProtection = currentGameMode !== GAME_MODES.hardcore;
+                document.getElementById('legendObstacle').style.display = showObstacles ? 'flex' : 'none';
+                document.getElementById('legendDangerous').style.display = showDangerous ? 'flex' : 'none';
+                var legendPoison = document.getElementById('legendPoison');
+                var legendCombo = document.getElementById('legendCombo');
+                var legendProtection = document.getElementById('legendProtection');
+                var legendShield = document.getElementById('legendShield');
+                if (legendPoison) legendPoison.style.display = showPoisonCombo ? 'flex' : 'none';
+                if (legendCombo) legendCombo.style.display = showPoisonCombo ? 'flex' : 'none';
+                if (legendProtection) legendProtection.style.display = showProtection ? 'flex' : 'none';
+                if (legendShield) legendShield.style.display = showProtection ? 'flex' : 'none';
             }
 
             function isBlocked(x, y) {
@@ -1079,6 +1401,7 @@
             function spawnObstacles() {
                 obstacles = [];
                 dangerousObstacles = [];
+                if (currentGameMode === GAME_MODES.zen) return;
                 const blocked = new Set();
                 snake.forEach(seg => blocked.add(seg.x + ',' + seg.y));
                 blocked.add(food.x + ',' + food.y);
@@ -1134,14 +1457,18 @@
                 }
 
                 var r = Math.random();
-                if (level >= 2 && r < 0.15) {
-                    newFood.type = 'golden';
-                } else if (level >= 4 && r >= 0.15 && r < 0.25) {
-                    newFood.type = 'poison';
-                } else if (comboCount >= 2 && r >= 0.25 && r < 0.55) {
-                    newFood.type = 'combo';
+                if (currentGameMode === GAME_MODES.zen) {
+                    newFood.type = (level >= 2 && r < 0.15) ? 'golden' : 'normal';
                 } else {
-                    newFood.type = 'normal';
+                    if (level >= 2 && r < 0.15) {
+                        newFood.type = 'golden';
+                    } else if (level >= 4 && r >= 0.15 && r < 0.25) {
+                        newFood.type = 'poison';
+                    } else if (comboCount >= 2 && r >= 0.25 && r < 0.55) {
+                        newFood.type = 'combo';
+                    } else {
+                        newFood.type = 'normal';
+                    }
                 }
                 food = newFood;
             }
@@ -1186,23 +1513,172 @@
                 ctx.globalAlpha = 1;
             }
 
+            function getInterpolatedSnake() {
+                if (snake.length === 0) return [];
+                var t = Math.min(1, (Date.now() - lastTickTime) / gameSpeed);
+                t = t * t * (3 - 2 * t);
+                var out = [];
+                var grew = snake.length > snakePrev.length;
+                var shrunk = snake.length < snakePrev.length;
+                for (var i = 0; i < snake.length; i++) {
+                    var from;
+                    if (grew) {
+                        from = (i === 0) ? snakePrev[0] : (snakePrev[i - 1] || snakePrev[0]);
+                    } else if (shrunk) {
+                        from = (i === 0) ? snakePrev[0] : (snakePrev[i - 1] || snakePrev[0]);
+                    } else {
+                        from = snakePrev[i] || snake[i];
+                    }
+                    var to = snake[i];
+                    out.push({
+                        x: from.x + (to.x - from.x) * t,
+                        y: from.y + (to.y - from.y) * t
+                    });
+                }
+                return out;
+            }
+
             function drawSnake() {
                 const cs = getCellSize();
-                const breathScale = 1 + 0.03 * Math.sin(Date.now() / 150);
-                snake.forEach(function(seg, i) {
+                const padding = 2;
+                const size = cs - padding * 2;
+                const r = cs * 0.58;
+                const half = size / 2;
+                var snakeToDraw = getInterpolatedSnake();
+                if (snakeToDraw.length === 0) return;
+
+                for (var i = snakeToDraw.length - 1; i >= 0; i--) {
+                    var seg = snakeToDraw[i];
                     ctx.save();
-                    const cx = seg.x * cs + cs / 2;
-                    const cy = seg.y * cs + cs / 2;
-                    ctx.translate(cx, cy);
-                    ctx.scale(breathScale, breathScale);
-                    ctx.translate(-cx, -cy);
-                    ctx.fillStyle = i === 0 ? '#0f380f' : '#306230';
-                    ctx.strokeStyle = '#0f380f';
-                    ctx.lineWidth = 1;
-                    ctx.fillRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
-                    ctx.strokeRect(seg.x * cs + 1, seg.y * cs + 1, cs - 2, cs - 2);
+                    const x = seg.x * cs + padding;
+                    const y = seg.y * cs + padding;
+                    const cx = x + half;
+                    const cy = y + half;
+
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+                    ctx.shadowBlur = 1;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 1;
+
+                    var d = getSegmentDir(i);
+                    var isHead = (i === 0);
+                    var isTail = (i === snake.length - 1);
+                    var isCurve = !isHead && !isTail && d.in !== d.out;
+
+                    if (isHead) {
+                        drawSnakeHead(cx, cy, r, d.out);
+                    } else if (isTail) {
+                        drawSnakeTail(cx, cy, r, d.in);
+                    } else if (isCurve) {
+                        drawSnakeCurve(cx, cy, r, d.in, d.out, x, y, size);
+                    } else {
+                        drawSnakeBodyStraight(cx, cy, r, d.in, x, y, size);
+                    }
+
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
                     ctx.restore();
-                });
+                }
+            }
+
+            function drawSnakeHead(cx, cy, r, dir) {
+                var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 1.2);
+                grad.addColorStop(0, '#2d5a2d');
+                grad.addColorStop(0.6, '#1a3d1a');
+                grad.addColorStop(1, '#0f380f');
+                ctx.fillStyle = grad;
+                ctx.strokeStyle = '#0f380f';
+                ctx.lineWidth = 1;
+                var a = dirToAngle(dir);
+                var rx = r * 1.05;
+                var ry = r * 0.82;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, a, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                var eyeOff = 0.35;
+                var eyeR = r * 0.2;
+                var perp = a + Math.PI / 2;
+                var ex1 = cx + Math.cos(a) * r * eyeOff + Math.cos(perp) * r * 0.25;
+                var ey1 = cy + Math.sin(a) * r * eyeOff + Math.sin(perp) * r * 0.25;
+                var ex2 = cx + Math.cos(a) * r * eyeOff - Math.cos(perp) * r * 0.25;
+                var ey2 = cy + Math.sin(a) * r * eyeOff - Math.sin(perp) * r * 0.25;
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(ex1, ey1, eyeR, 0, Math.PI * 2);
+                ctx.arc(ex2, ey2, eyeR, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0f380f';
+                ctx.beginPath();
+                ctx.arc(ex1, ey1, eyeR * 0.5, 0, Math.PI * 2);
+                ctx.arc(ex2, ey2, eyeR * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function drawSnakeTail(cx, cy, r, dir) {
+                var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                grad.addColorStop(0, '#3d7a3d');
+                grad.addColorStop(0.7, '#306230');
+                grad.addColorStop(1, '#1a4a1a');
+                ctx.fillStyle = grad;
+                ctx.strokeStyle = '#0f380f';
+                ctx.lineWidth = 1;
+                var a = dirToAngle(dir);
+                var tipX = cx - Math.cos(a) * r;
+                var tipY = cy - Math.sin(a) * r;
+                var perp = a + Math.PI / 2;
+                var w = r * 0.6;
+                var p1x = tipX + Math.cos(perp) * w;
+                var p1y = tipY + Math.sin(perp) * w;
+                var p2x = tipX - Math.cos(perp) * w;
+                var p2y = tipY - Math.sin(perp) * w;
+                var baseX = cx + Math.cos(a) * r * 0.5;
+                var baseY = cy + Math.sin(a) * r * 0.5;
+                ctx.beginPath();
+                ctx.moveTo(tipX, tipY);
+                ctx.lineTo(p1x, p1y);
+                ctx.quadraticCurveTo(cx + Math.cos(perp) * r, cy + Math.sin(perp) * r, baseX, baseY);
+                ctx.quadraticCurveTo(cx - Math.cos(perp) * r, cy - Math.sin(perp) * r, p2x, p2y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            function drawSnakeBodyStraight(cx, cy, r, dir, x, y, size) {
+                var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                grad.addColorStop(0, '#3d7a3d');
+                grad.addColorStop(0.5, '#306230');
+                grad.addColorStop(1, '#1a4a1a');
+                ctx.fillStyle = grad;
+                ctx.strokeStyle = '#0f380f';
+                ctx.lineWidth = 0.5;
+                var a = dirToAngle(dir);
+                var isH = (dir === 'left' || dir === 'right');
+                var rx = isH ? r : r * 0.92;
+                var ry = isH ? r * 0.92 : r;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, a, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            function drawSnakeCurve(cx, cy, r, inDir, outDir, x, y, size) {
+                var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                grad.addColorStop(0, '#3d7a3d');
+                grad.addColorStop(0.5, '#306230');
+                grad.addColorStop(1, '#1a4a1a');
+                ctx.fillStyle = grad;
+                ctx.strokeStyle = '#0f380f';
+                ctx.lineWidth = 0.5;
+                var a1 = dirToAngle(inDir);
+                var a2 = dirToAngle(outDir);
+                var midA = (a1 + a2) / 2;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, r, r, midA, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
             }
 
             function drawObstacles() {
@@ -1264,10 +1740,11 @@
                     x: head.x + delta.x,
                     y: head.y + delta.y
                 };
-                const hasProtection = activeBuffs.protection || protectionGraceTick;
+                const hasProtection = currentGameMode !== GAME_MODES.hardcore && (activeBuffs.protection || protectionGraceTick);
+                const useShield = currentGameMode !== GAME_MODES.hardcore && shieldActive;
                 const outOfBounds = newHead.x < 0 || newHead.x >= currentGridSize || newHead.y < 0 || newHead.y >= currentGridSize;
-                if ((hasProtection || shieldActive) && outOfBounds) {
-                    if (shieldActive && !hasProtection) {
+                if ((hasProtection || useShield) && outOfBounds) {
+                    if (useShield && !hasProtection) {
                         shieldActive = false;
                         if (shieldIcon) shieldIcon.style.display = 'none';
                     }
@@ -1332,7 +1809,7 @@
                     snake.pop();
                     applyBuff(buffItem.type);
                 } else if (isOnDangerousObstacle(newHead.x, newHead.y) && !hasProtection) {
-                    if (shieldActive) {
+                    if (useShield) {
                         shieldActive = false;
                         if (shieldIcon) shieldIcon.style.display = 'none';
                     } else {
@@ -1344,7 +1821,7 @@
                 } else if (isBlocked(newHead.x, newHead.y) && !hasProtection) {
                 } else {
                     const hitsBody = snake.some(function(seg, i) { return i > 0 && seg.x === newHead.x && seg.y === newHead.y; });
-                    if (hitsBody && shieldActive) {
+                    if (hitsBody && useShield) {
                         shieldActive = false;
                         if (shieldIcon) shieldIcon.style.display = 'none';
                     } else {
@@ -1356,10 +1833,10 @@
 
             function checkCollision() {
                 const head = snake[0];
-                const hasProtection = activeBuffs.protection || protectionGraceTick;
+                const hasProtection = currentGameMode !== GAME_MODES.hardcore && (activeBuffs.protection || protectionGraceTick);
 
                 if (hasProtection) return false;
-                if (shieldActive) {
+                if (currentGameMode !== GAME_MODES.hardcore && shieldActive) {
                     if (head.x < 0 || head.x >= currentGridSize || head.y < 0 || head.y >= currentGridSize) {
                         shieldActive = false;
                         if (shieldIcon) shieldIcon.style.display = 'none';
@@ -1403,20 +1880,26 @@
                 requestAnimationFrame(shakeLoop);
             }
 
-            function endGame() {
+            function endGame(survivalWon) {
                 if (gameOver) return;
                 gameOver = true;
                 AudioSystem.bgMusicStop();
-                AudioSystem.gameOver();
-                runScreenShake();
+                if (!survivalWon) {
+                    AudioSystem.gameOver();
+                    runScreenShake();
+                }
                 clearInterval(gameLoopId);
                 gameLoopId = null;
+                var gameOverTitle = document.getElementById('gameOverTitle');
+                if (gameOverTitle) {
+                    gameOverTitle.textContent = survivalWon ? 'Tempo esgotado! Você sobreviveu!' : 'Game Over!';
+                }
                 finalScoreEl.textContent = score;
                 finalLevelEl.textContent = level;
                 finalTimeEl.textContent = formatTime(Date.now() - gameStartTime);
-                if (RecordeSystem.isRecorde(score)) {
+                if (RecordeSystem.isRecorde(score, currentGameMode)) {
                     const name = prompt('Novo recorde! Digite seu nome:', '') || 'Anônimo';
-                    RecordeSystem.set(score, name);
+                    RecordeSystem.set(score, name, currentGameMode);
                 }
                 updateRecordeDisplay();
                 gameOverOverlay.style.display = 'flex';
@@ -1426,13 +1909,23 @@
             function tick() {
                 if (gameOver || levelUpPaused || gamePaused) return;
 
+                if (currentGameMode === GAME_MODES.survival) {
+                    var elapsed = Date.now() - gameStartTime;
+                    if (elapsed >= survivalTimeLimit * 1000) {
+                        endGame(true);
+                        return;
+                    }
+                }
+
                 nextDirection = getNextDirectionFromInput();
 
                 updateBuffs();
                 if (gameOver) return;
 
                 moveFoodTowardSnake();
+                snakePrev = snake.map(function(s) { return { x: s.x, y: s.y }; });
                 moveSnake();
+                lastTickTime = Date.now();
 
                 if (checkCollision()) {
                     endGame();
@@ -1441,15 +1934,33 @@
 
                 updateTimeDisplay();
                 updateBuffDisplay();
-                draw();
             }
 
-            function startGame() {
-                initGame();
+            function renderLoop() {
+                draw();
+                renderLoopId = requestAnimationFrame(renderLoop);
+            }
+
+            function startGame(mode, survivalSeconds) {
+                initGame(mode, survivalSeconds);
                 AudioSystem.start();
                 AudioSystem.bgMusicPlay();
                 draw();
                 gameLoopId = setInterval(tick, gameSpeed);
+                if (renderLoopId) cancelAnimationFrame(renderLoopId);
+                renderLoop();
+            }
+
+            function goBackToMenu() {
+                gamePaused = false;
+                pauseOverlay.style.display = 'none';
+                if (gameLoopId) {
+                    clearInterval(gameLoopId);
+                    gameLoopId = null;
+                }
+                AudioSystem.bgMusicStop();
+                if (modeSelectOverlay) modeSelectOverlay.style.display = 'flex';
+                if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[currentGameMode] || MODE_DESCRIPTIONS.classic;
             }
 
             document.addEventListener('keydown', function(e) {
@@ -1457,17 +1968,16 @@
                 if (key === 'escape') {
                     e.preventDefault();
                     if (gameOver || levelUpPaused) return;
-                    gamePaused = !gamePaused;
                     if (gamePaused) {
-                        if (gameLoopId) {
-                            clearInterval(gameLoopId);
-                            gameLoopId = null;
-                        }
-                        pauseOverlay.style.display = 'flex';
-                    } else {
-                        pauseOverlay.style.display = 'none';
-                        gameLoopId = setInterval(tick, gameSpeed);
+                        goBackToMenu();
+                        return;
                     }
+                    gamePaused = true;
+                    if (gameLoopId) {
+                        clearInterval(gameLoopId);
+                        gameLoopId = null;
+                    }
+                    pauseOverlay.style.display = 'flex';
                     return;
                 }
                 if (gamePaused) return;
@@ -1498,8 +2008,68 @@
                 if (document.hidden) clearPressedKeys();
             });
 
-            restartBtn.addEventListener('click', startGame);
-            restartBtnOverlay.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', function() { startGame(); });
+            restartBtnOverlay.addEventListener('click', function() { startGame(); });
+
+            var resumeBtn = document.getElementById('resumeBtn');
+            var backToMenuBtn = document.getElementById('backToMenuBtn');
+            if (resumeBtn) {
+                resumeBtn.addEventListener('click', function() {
+                    if (!gamePaused) return;
+                    gamePaused = false;
+                    pauseOverlay.style.display = 'none';
+                    gameLoopId = setInterval(tick, gameSpeed);
+                });
+            }
+            if (backToMenuBtn) {
+                backToMenuBtn.addEventListener('click', goBackToMenu);
+            }
+
+            var modeSelectOverlay = document.getElementById('modeSelectOverlay');
+            var startGameBtn = document.getElementById('startGameBtn');
+            var survivalTimeOptions = document.getElementById('survivalTimeOptions');
+            var modeDescription = document.getElementById('modeDescription');
+
+            var MODE_DESCRIPTIONS = {
+                classic: 'Modo padrão com obstáculos, buffs e veneno.',
+                survival: 'Sobreviva até o tempo acabar! Escolha o tempo limite.',
+                hardcore: 'Sem buffs de proteção (protection/shield). Só habilidade!',
+                zen: 'Sem obstáculos nem veneno. Apenas maçã e dourada.'
+            };
+
+            document.querySelectorAll('input[name="mode"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    var mode = this.value;
+                    currentGameMode = mode;
+                    if (survivalTimeOptions) {
+                        survivalTimeOptions.style.display = mode === 'survival' ? 'flex' : 'none';
+                    }
+                    if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[mode] || '';
+                });
+            });
+
+            if (survivalTimeOptions) {
+                survivalTimeOptions.querySelectorAll('button').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        survivalTimeOptions.querySelectorAll('button').forEach(function(b) { b.classList.remove('selected'); });
+                        this.classList.add('selected');
+                        survivalTimeLimit = parseInt(this.getAttribute('data-min'), 10) * 60;
+                    });
+                });
+            }
+
+            if (startGameBtn) {
+                startGameBtn.addEventListener('click', function() {
+                    var selected = document.querySelector('input[name="mode"]:checked');
+                    if (selected) currentGameMode = selected.value;
+                    if (currentGameMode === 'survival') {
+                        var selBtn = survivalTimeOptions && survivalTimeOptions.querySelector('button.selected');
+                        if (selBtn) survivalTimeLimit = parseInt(selBtn.getAttribute('data-min'), 10) * 60;
+                    }
+                    if (modeSelectOverlay) modeSelectOverlay.style.display = 'none';
+                    startGame(currentGameMode, currentGameMode === 'survival' ? survivalTimeLimit : undefined);
+                });
+            }
 
             window.addEventListener('resize', function() {
                 resizeCanvas();
@@ -1510,7 +2080,12 @@
             initLegendSprites();
             loadSprites(function() {
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
-                startGame();
+                if (modeSelectOverlay) {
+                    modeSelectOverlay.style.display = 'flex';
+                    modeDescription.textContent = MODE_DESCRIPTIONS.classic;
+                } else {
+                    startGame();
+                }
                 requestAnimationFrame(function() {
                     resizeCanvas();
                     draw();
