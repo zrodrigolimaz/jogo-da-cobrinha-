@@ -324,6 +324,8 @@
             let food = { x: 0, y: 0 };
             let direction = 'right';
             let nextDirection = 'right';
+            let directionQueue = [];
+            const MAX_DIRECTION_QUEUE = 5;
             let score = 0;
             let level = 1;
             let gameSpeed = INITIAL_SPEED;
@@ -380,6 +382,7 @@
                 ];
                 direction = 'right';
                 nextDirection = 'right';
+                directionQueue = [];
                 score = 0;
                 level = 1;
                 gameSpeed = getSpeedForLevel(1);
@@ -556,6 +559,9 @@
             function tick() {
                 if (gameOver || levelUpPaused) return;
 
+                if (directionQueue.length > 0) {
+                    nextDirection = directionQueue.shift();
+                }
                 moveSnake();
 
                 if (checkCollision()) {
@@ -575,6 +581,7 @@
 
             document.addEventListener('keydown', function(e) {
                 if (gameOver) return;
+                if (e.repeat) return;
 
                 const key = e.key.toLowerCase();
                 let newDir = null;
@@ -584,9 +591,15 @@
                 else if (key === 'a') newDir = 'left';
                 else if (key === 'd') newDir = 'right';
 
-                if (newDir && newDir !== opposite[direction]) {
-                    nextDirection = newDir;
-                    e.preventDefault();
+                if (newDir) {
+                    const currentDir = directionQueue.length > 0 ? directionQueue[directionQueue.length - 1] : direction;
+                    if (newDir !== opposite[currentDir] && directionQueue[directionQueue.length - 1] !== newDir) {
+                        if (directionQueue.length >= MAX_DIRECTION_QUEUE) {
+                            directionQueue.shift();
+                        }
+                        directionQueue.push(newDir);
+                        e.preventDefault();
+                    }
                 }
             });
 
